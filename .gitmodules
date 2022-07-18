@@ -1,0 +1,6 @@
+[submodule "libsodium"]
+	path = libsodium
+	url = git@github.com:algorand/libsodium.git
+[submodule "app/submodules/sodium-native"]
+	path = app/submodules/sodium-native
+	url = https://github.com/appliedblockchain/sodium-native

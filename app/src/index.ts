@@ -1,14 +1,13 @@
+import 'dotenv/config'
 import algosdk from 'algosdk'
 
-const token = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-const server = 'http://127.0.0.1'
-const port = 4001
-const client = new algosdk.Algodv2(token, server, port)
+const client = new algosdk.Algodv2(process.env.ALGOD_TOKEN, process.env.ALGOD_SERVER, process.env.ALGOD_PORT)
 
 ;(async () => {
-  console.log('Status: ')
-  console.log(await client.status().do())
+  const status = await client.status().do()
+  const lastRound = status['last-round']
+  const block = await client.block(lastRound).do()
+  console.log({ status, block })
 })().catch((e) => {
   console.log(e)
 })
-const b = {g: 9}

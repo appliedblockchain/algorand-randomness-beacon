@@ -1,4 +1,4 @@
-interface KeyPair {
+export interface KeyPair {
   pk: Buffer
   sk: Buffer
 }

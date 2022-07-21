@@ -1,4 +1,3 @@
-// @ts-nocheck
 import sodium from 'sodium-native'
 import { generateVrfKeyPair, vrfProve, vrfProofToHash, vrfVerify } from './libsodium-wrapper'
 

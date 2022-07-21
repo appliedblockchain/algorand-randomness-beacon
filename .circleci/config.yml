@@ -1,0 +1,37 @@
+version: 2.1
+
+jobs:
+  test-app:
+    docker:
+      - image: cimg/node:lts
+        environment:
+          NODE_ENV: test
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - app-{{ checksum "app/package.json" }}
+      - run:
+          name: Install dependencies
+          command: |-
+            cd app
+            npm i
+      - save_cache:
+          key: app-{{ checksum "app/package.json" }}
+          paths:
+            - app/node_modules
+            - submodules
+      - run:
+          name: Test
+          command: |
+            cd app
+            npm run test
+      - store_test_results:
+          path: app/reports/junit
+      - store_artifacts:
+          path: app/reports/coverage
+
+workflows:
+  test-app:
+    jobs:
+      - test-app

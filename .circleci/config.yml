@@ -8,6 +8,9 @@ jobs:
           NODE_ENV: test
     steps:
       - checkout
+      - run:
+          name: Git submodules init
+          command: git submodule update --init --recursive
       - restore_cache:
           keys:
             - app-{{ checksum "app/package.json" }}

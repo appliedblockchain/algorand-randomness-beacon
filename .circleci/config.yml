@@ -23,7 +23,6 @@ jobs:
           key: app-{{ checksum "app/package.json" }}
           paths:
             - app/node_modules
-            - submodules
       - run:
           name: Test
           command: |

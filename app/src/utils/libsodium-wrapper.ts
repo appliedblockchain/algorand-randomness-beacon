@@ -40,3 +40,10 @@ export const vrfVerify = (pk: Buffer, proof: Buffer, message: Buffer) => {
     throw error
   }
 }
+
+export const vrfSkToPk = (skpk: Buffer): Buffer => {
+  const pk = Buffer.alloc(sodium.crypto_vrf_PUBLICKEYBYTES)
+  sodium.crypto_vrf_sk_to_pk(pk, skpk)
+
+  return pk
+}

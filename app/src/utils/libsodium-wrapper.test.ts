@@ -1,5 +1,5 @@
 import sodium from 'sodium-native'
-import { generateVrfKeyPair, vrfProve, vrfProofToHash, vrfVerify } from './libsodium-wrapper'
+import { generateVrfKeyPair, vrfProve, vrfProofToHash, vrfVerify, vrfSkToPk } from './libsodium-wrapper'
 
 describe('libsodium-wrapper', () => {
   it('generateVrfKeyPair()', () => {
@@ -55,6 +55,15 @@ describe('libsodium-wrapper', () => {
       const proof = vrfProve(sk, message)
       const anotherMessage = Buffer.from('Not the message used to make the proof')
       expect(() => vrfVerify(pk, proof, anotherMessage)).toThrow()
+    })
+  })
+
+  describe('vrfSkToPk()', () => {
+    it('get publick key from secret key', () => {
+      const { sk, pk } = generateVrfKeyPair()
+      const resultPk = vrfSkToPk(sk)
+
+      expect(pk).toEqual(resultPk)
     })
   })
 })

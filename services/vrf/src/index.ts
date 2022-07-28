@@ -1,4 +1,5 @@
 import 'dotenv/config'
-import loop from './loop'
 
-loop()
+setInterval(() => {
+  console.log('TODO: GRPC server')
+}, 10000)

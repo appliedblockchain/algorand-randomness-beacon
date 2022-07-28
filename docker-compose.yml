@@ -6,7 +6,7 @@ services:
     image: appliedblockchain/algorand-randomness-beacon-app:latest
     build:
       context: ./services/app
-      dockerfile: ./services/app/Dockerfile
+      dockerfile: ./Dockerfile
     depends_on:
       - vrf
     environment:
@@ -24,10 +24,8 @@ services:
     hostname: algorand-randomness-beacon-vrf
     image: appliedblockchain/algorand-randomness-beacon-vrf:latest
     build:
-      context: ../services/vrf
-      dockerfile: ./services/vrf/Dockerfile
-    depends_on:
-      - vrf
+      context: ./services/vrf
+      dockerfile: ./Dockerfile
     environment:
       - NODE_ENV=${GIT_HANODE_ENVSH_VERSION}
       - LOG_LEVEL=${LOG_LEVEL}

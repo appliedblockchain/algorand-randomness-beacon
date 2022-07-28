@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  app:
+    hostname: algorand-randomness-beacon-app
+    image: appliedblockchain/algorand-randomness-beacon-app:latest
+    build:
+      context: ./services/app
+      dockerfile: ./services/app/Dockerfile
+    depends_on:
+      - vrf
+    environment:
+      - NODE_ENV=${GIT_HANODE_ENVSH_VERSION}
+      - LOG_LEVEL=${LOG_LEVEL}
+      - ALGOD_TOKEN=${ALGOD_TOKEN}
+      - ALGOD_SERVER=${ALGOD_SERVER}
+      - ALGOD_PORT=${ALGOD_PORT}
+      - APP_ID=${APP_ID}
+      - SERVICE_KEY=${SERVICE_KEY}
+      - SIGNING_KEY=${SIGNING_KEY}
+      - STARTING_ROUND=${STARTING_ROUND}
+
+  vrf:
+    hostname: algorand-randomness-beacon-vrf
+    image: appliedblockchain/algorand-randomness-beacon-vrf:latest
+    build:
+      context: ../services/vrf
+      dockerfile: ./services/vrf/Dockerfile
+    depends_on:
+      - vrf
+    environment:
+      - NODE_ENV=${GIT_HANODE_ENVSH_VERSION}
+      - LOG_LEVEL=${LOG_LEVEL}
+      - AWS_REGION=${AWS_REGION}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - VRF_SECRET_KEY=${VRF_SECRET_KEY}

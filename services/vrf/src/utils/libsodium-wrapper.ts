@@ -1,4 +1,4 @@
-import sodium from 'sodium-native'
+import sodium from '@appliedblockchain/sodium-native-vrf'
 import { KeyPair } from '../types'
 
 export const generateVrfKeyPair = (): KeyPair => {

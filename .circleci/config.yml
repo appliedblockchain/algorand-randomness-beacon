@@ -1,6 +1,35 @@
 version: 2.1
 
 jobs:
+  test-vrf:
+    docker:
+      - image: cimg/node:lts
+        environment:
+          NODE_ENV: test
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - app-{{ checksum "services/vrf/package.json" }}
+      - run:
+          name: Install dependencies
+          command: |-
+            cd services/vrf
+            npm i
+      - save_cache:
+          key: app-{{ checksum "services/vrf/package.json" }}
+          paths:
+            - services/vrf/node_modules
+      - run:
+          name: Test
+          command: |
+            cd services/vrf
+            npm run test
+      - store_test_results:
+          path: services/vrf/reports/junit
+      - store_artifacts:
+          path: services/vrf/reports/coverage
+
   test-app:
     docker:
       - image: cimg/node:lts
@@ -8,30 +37,27 @@ jobs:
           NODE_ENV: test
     steps:
       - checkout
-      - run:
-          name: Git submodules init
-          command: git submodule update --init --recursive
       - restore_cache:
           keys:
-            - app-{{ checksum "app/package.json" }}
+            - app-{{ checksum "services/app/package.json" }}
       - run:
           name: Install dependencies
           command: |-
-            cd app
+            cd services/app
             npm i
       - save_cache:
-          key: app-{{ checksum "app/package.json" }}
+          key: app-{{ checksum "services/app/package.json" }}
           paths:
-            - app/node_modules
+            - services/app/node_modules
       - run:
           name: Test
           command: |
-            cd app
+            cd services/app
             npm run test
       - store_test_results:
-          path: app/reports/junit
+          path: services/app/reports/junit
       - store_artifacts:
-          path: app/reports/coverage
+          path: services/app/reports/coverage
 
 workflows:
   test-app:

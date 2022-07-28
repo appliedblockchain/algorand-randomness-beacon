@@ -60,6 +60,8 @@ jobs:
           path: services/app/reports/coverage
 
 workflows:
-  test-app:
+  test-services:
     jobs:
       - test-app
+      - test-vrf
+

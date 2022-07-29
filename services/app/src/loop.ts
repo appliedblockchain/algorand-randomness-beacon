@@ -1,16 +1,11 @@
 import { getBlockSeed, getLastRound } from './utils/algo-utils'
-import { vrfProofToHash, vrfProve } from './utils/libsodium-wrapper'
-import { getOracleKeyPair } from './utils/oracle-key-pair'
 import buildVrfInput from './utils/vrf'
 import logger from './logger'
 import { BLOCK_INTERVAL } from './constants'
 
 const getProofHash = async (vrfInput: string): Promise<string> => {
-  const oracleKeyPair = await getOracleKeyPair()
-  const proof = vrfProve(oracleKeyPair.sk, Buffer.from(vrfInput))
-  const hash = vrfProofToHash(proof)
-
-  return hash.toString('hex')
+  // TODO: Request to VRF generator service
+  return vrfInput
 }
 
 const mainFlow = async () => {

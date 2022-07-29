@@ -1,4 +1,4 @@
-import sodium from 'sodium-native'
+import sodium from '@appliedblockchain/sodium-native-vrf'
 import { generateVrfKeyPair, vrfProve, vrfProofToHash, vrfVerify, vrfSkToPk } from './libsodium-wrapper'
 
 describe('libsodium-wrapper', () => {

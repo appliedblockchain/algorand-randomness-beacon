@@ -1,24 +1,20 @@
 {
-  "name": "vrf-oracle",
+  "name": "vrf-generator",
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "build:sodium-native": "cd ../submodules/sodium-native && npm i && npm run fetch-libsodium && npm run dev",
-    "build:sodium-native:dev": "cd ../submodules/sodium-native && npm run dev",
     "lint": "eslint .",
     "test": "jest",
     "start:dev": "nodemon",
-    "start": "node dist/index.js",
-    "preinstall": "npm run build:sodium-native"
+    "start": "node dist/index.js"
   },
   "author": "Ricardo Seromenho",
   "license": "ISC",
   "dependencies": {
-    "algosdk": "1.18.1",
+    "@appliedblockchain/sodium-native-vrf": "3.3.2",
     "dotenv": "16.0.1",
-    "sodium-native": "file:../submodules/sodium-native",
     "winston": "3.8.1"
   },
   "devDependencies": {

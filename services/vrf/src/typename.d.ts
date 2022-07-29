@@ -1,4 +1,4 @@
-declare module 'sodium-native' {
+declare module '@appliedblockchain/sodium-native-vrf' {
   /**
    * Create a new keypair.
    *

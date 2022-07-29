@@ -6,6 +6,11 @@ jobs:
       - image: cimg/node:lts
         environment:
           NODE_ENV: test
+      - image: localstack/localstack:latest
+        environment:
+          - SERVICES=kms
+          - DEFAULT_REGION=eu-west-2
+          - KMS_PROVIDER=local-kms
     steps:
       - checkout
       - restore_cache:
@@ -64,4 +69,3 @@ workflows:
     jobs:
       - test-app
       - test-vrf
-

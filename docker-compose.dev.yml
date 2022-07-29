@@ -14,6 +14,7 @@ services:
     network_mode: "host"
     volumes:
       - ./services/app:/usr/src/app
+      - /usr/src/app/node_modules
 
   vrf:
     hostname: algorand-randomness-beacon-vrf
@@ -25,4 +26,19 @@ services:
       - ./services/vrf/.env
     volumes:
       - ./services/vrf:/usr/src/app
+      - /usr/src/app/node_modules
 
+
+  localstack:
+    image: localstack/localstack:latest
+    environment:
+      - EDGE_PORT=4566
+      - SERVICES=kms
+      - DATA_DIR=/tmp/localstack/data
+      - DEFAULT_REGION=eu-west-2
+      - KMS_PROVIDER=local-kms
+    ports:
+      - "4566-4583:4566-4583"
+      - "9000:9000"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"

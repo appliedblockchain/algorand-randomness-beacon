@@ -2,6 +2,6 @@
 FROM node@sha256:8cb8d1582f235b30eea033baddde78b17143348fb392154d4c67a3c08307a8f2
 WORKDIR /usr/src/app
 COPY . /usr/src/app
-RUN npm install
+RUN npm install && ./build-proto.sh
 
 CMD [ "npm", "run", "start:dev" ]

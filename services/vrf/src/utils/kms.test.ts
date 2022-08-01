@@ -19,7 +19,7 @@ describe('KMS', () => {
       process.env = {
         ...originalEnv,
         AWS_KMS_KEY_ID: kmsKeyId,
-        VRF_ENCRYPTED_SECRET_KEY: Buffer.from(CiphertextBlob).toString('base64'),
+        VRF_ENCRYPTED_KEY: Buffer.from(CiphertextBlob).toString('base64'),
       }
     })
     it('decrypts the key', async () => {

@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package vrf;
+
+message VRFInput {
+  string vrf_input = 1;
+}
+
+message VRFProof {
+  string proofHash = 1;
+}
+
+service Vrf {
+  rpc GenerateProof(VRFInput)
+      returns (VRFProof) {}
+}

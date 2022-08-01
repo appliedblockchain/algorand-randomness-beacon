@@ -11,7 +11,7 @@ const useLocalstack = LOCALSTACK_ENVIRONMENTS.includes(process.env.NODE_ENV)
 export const client = new AWS.KMS({
   credentials,
   region: process.env.AWS_REGION,
-  endpoint: useLocalstack ? 'http://localstack:4566' : undefined,
+  endpoint: useLocalstack ? process.env.LOCALSTACK_ENDPOINT : undefined,
 })
 
 // Cache the key to avoid keep doing decrypt

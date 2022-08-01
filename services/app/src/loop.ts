@@ -2,10 +2,16 @@ import { getBlockSeed, getLastRound } from './utils/algo-utils'
 import buildVrfInput from './utils/vrf'
 import logger from './logger'
 import { BLOCK_INTERVAL } from './constants'
+import { generateProof } from './utils/grpc-client'
+import { VRFInput } from './proto/vrf/VRFInput'
 
-const getProofHash = async (vrfInput: string): Promise<string> => {
-  // TODO: Request to VRF generator service
-  return vrfInput
+const getProofHash = async (vrfInput: string): Promise<string | undefined> => {
+  try {
+    const result = await generateProof({ vrfInput } as VRFInput)
+    return result.proofHash
+  } catch (error) {
+    logger.error(error)
+  }
 }
 
 const mainFlow = async () => {
@@ -28,6 +34,7 @@ const mainFlow = async () => {
 
     logger.info('Building VRF input', { lastRound, blockSeed })
     const vrfInput = buildVrfInput(lastRound, blockSeed)
+
     logger.info('Getting the proof hash', { vrfInput })
     const hash = await getProofHash(vrfInput)
     logger.debug({ lastRound, blockSeed, vrfInput, hash })

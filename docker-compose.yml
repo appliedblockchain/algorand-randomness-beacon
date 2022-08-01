@@ -33,3 +33,5 @@ services:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - VRF_SECRET_KEY=${VRF_SECRET_KEY}
+    ports:
+      - "50051:50051"

@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
+    "build:proto": "proto-loader-gen-types --longs=String --enums=String --defaults --oneofs --grpcLib=@grpc/grpc-js --outDir=src/proto/ src/proto/*.proto",
     "lint": "eslint .",
     "test": "jest",
     "start:dev": "nodemon",
@@ -15,6 +16,8 @@
   "dependencies": {
     "@appliedblockchain/sodium-native-vrf": "3.3.2",
     "@aws-sdk/client-kms": "3.137.0",
+    "@grpc/grpc-js": "1.6.8",
+    "@grpc/proto-loader": "0.7.0",
     "dotenv": "16.0.1",
     "winston": "3.8.1"
   },

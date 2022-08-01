@@ -36,9 +36,13 @@ services:
       - SERVICES=kms
       - DATA_DIR=/tmp/localstack/data
       - DEFAULT_REGION=eu-west-2
+      - KMS_REGION=eu-west-2
       - KMS_PROVIDER=local-kms
+      - KMS_SEED_PATH=
     ports:
       - "4566-4583:4566-4583"
       - "9000:9000"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
+      - ".localstack/kms-data:/tmp/local-kms"
+      - "./docker/kms:/init"

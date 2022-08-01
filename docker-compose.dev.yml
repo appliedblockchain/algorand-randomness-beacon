@@ -22,8 +22,12 @@ services:
     build:
       context: ./services/vrf
       dockerfile: ./Dockerfile.dev
+    depends_on:
+      - localstack
     env_file:
       - ./services/vrf/.env
+    ports:
+      - "50051:50051"
     volumes:
       - ./services/vrf:/usr/src/app
       - /usr/src/app/node_modules

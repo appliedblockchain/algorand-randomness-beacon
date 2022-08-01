@@ -11,7 +11,7 @@ const useLocalstack = LOCALSTACK_ENVIRONMENTS.includes(process.env.NODE_ENV)
 export const client = new AWS.KMS({
   credentials,
   region: process.env.AWS_REGION,
-  endpoint: useLocalstack ? 'http://localhost:4566' : undefined,
+  endpoint: useLocalstack ? 'http://localstack:4566' : undefined,
 })
 
 // Cache the key to avoid keep doing decrypt
@@ -23,7 +23,7 @@ const decryptVrfKey = async () => {
 
   const { Plaintext } = await client.decrypt({
     KeyId: process.env.AWS_KMS_KEY_ID,
-    CiphertextBlob: Buffer.from(process.env.VRF_ENCRYPTED_SECRET_KEY, 'base64'),
+    CiphertextBlob: Buffer.from(process.env.VRF_ENCRYPTED_KEY, 'base64'),
   })
 
   decryptedKey = Buffer.from(Plaintext).toString('utf-8')

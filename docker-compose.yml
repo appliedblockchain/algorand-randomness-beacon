@@ -16,9 +16,10 @@ services:
       - ALGOD_SERVER=${ALGOD_SERVER}
       - ALGOD_PORT=${ALGOD_PORT}
       - APP_ID=${APP_ID}
+      - APP_CREATOR_KEY=${APP_CREATOR_KEY}
       - SERVICE_KEY=${SERVICE_KEY}
-      - SIGNING_KEY=${SIGNING_KEY}
       - STARTING_ROUND=${STARTING_ROUND}
+      - VRF_GRPC_HOST=${VRF_GRPC_HOST}
 
   vrf:
     hostname: algorand-randomness-beacon-vrf
@@ -32,6 +33,10 @@ services:
       - AWS_REGION=${AWS_REGION}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - VRF_SECRET_KEY=${VRF_SECRET_KEY}
+      - AWS_KMS_KEY_ID=${AWS_KMS_KEY_ID}
+      - VRF_ENCRYPTED_KEY=${VRF_ENCRYPTED_KEY}
+      - GRPC_ADDRESS=${GRPC_ADDRESS}
+      - GRPC_PORT=${GRPC_PORT}
+
     ports:
       - "50051:50051"

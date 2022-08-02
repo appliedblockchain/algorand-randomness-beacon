@@ -134,3 +134,4 @@ src/wip
 
 # Proto files
 src/proto
+!src/proto/vrf.proto

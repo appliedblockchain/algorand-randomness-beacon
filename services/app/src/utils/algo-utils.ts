@@ -1,7 +1,11 @@
 import algosdk from 'algosdk'
+import fs from 'fs'
 import { TealKeyValue } from 'algosdk/dist/types/src/client/v2/algod/models/types'
 
 const client = new algosdk.Algodv2(process.env.ALGOD_TOKEN as string, process.env.ALGOD_SERVER, process.env.ALGOD_PORT)
+
+const contractBuff = fs.readFileSync("../contract.json")
+export const contract = new algosdk.ABIContract(JSON.parse(contractBuff.toString()))
 
 export const getLastRound = async (): Promise<number> => {
   const status = await client.status().do()
@@ -15,7 +19,7 @@ export const getBlockSeed = async (round: number): Promise<string> => {
 
 export const getGlobalState = async (): Promise<TealKeyValue[]> => {
   const applicationInfoResponse = await client
-    .accountApplicationInformation(process.env.APP_CREATOR_ADDRESS as string, Number(process.env.APP_ID))
+    .accountApplicationInformation(process.env.APP_CREATOR_ADDRESS as string, Number(process.env.APP_ID as string))
     .do()
   return applicationInfoResponse['created-app']['global-state']
 }
@@ -36,4 +40,8 @@ export const getGlobalStateValue = async (key: string): Promise<string | number 
   }
 
   return getValueFromKeyValue(keyValue)
+}
+
+export const submitValue = (blockNumber: number, blockSeed: string, vrfOutput: string) => {
+  // TODO:
 }

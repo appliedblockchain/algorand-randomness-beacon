@@ -78,7 +78,12 @@ const getAccountsFromKmd = async (): Promise<algosdk.Account[]> => {
   })
 }
 
-const executeAbiContract = async (contractPath: string, account?: algosdk.Account) => {
+const executeAbiContract = async (
+  contractPath: string,
+  method: string,
+  methodArgs: algosdk.ABIArgument[],
+  account?: algosdk.Account
+) => {
   let acct
   if (!account) {
     // Get account from sandbox
@@ -108,8 +113,8 @@ const executeAbiContract = async (contractPath: string, account?: algosdk.Accoun
 
   // Simple ABI Calls with standard arguments, return type
   comp.addMethodCall({
-    method: abiContract.getMethodByName('add'),
-    methodArgs: [ 1, 1 ],
+    method: abiContract.getMethodByName(method),
+    methodArgs,
     ...commonParams
   })
 
@@ -121,5 +126,5 @@ const executeAbiContract = async (contractPath: string, account?: algosdk.Accoun
 }
 
 export const submitValue = async (blockNumber: number, blockSeed: string, vrfOutput: string) => {
-  await executeAbiContract('../contract.json')
+  await executeAbiContract('../contract.json', 'foo', [ 1 ])
 }

@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/node'
 import { getBlockSeed, getLastRound } from './utils/algo-utils'
 import buildVrfInput from './utils/vrf'
 import logger from './logger'
@@ -39,6 +40,7 @@ const mainFlow = async () => {
     const vrfProof = await getVrfProof(vrfInput)
     logger.debug({ lastRound, blockSeed, vrfInput, vrfProof })
   } catch (error) {
+    Sentry.captureException(error)
     logger.error(error)
   }
 }

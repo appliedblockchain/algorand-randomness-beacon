@@ -1,4 +1,5 @@
 import * as grpc from '@grpc/grpc-js'
+import * as Sentry from '@sentry/node'
 import logger from './logger'
 import { VrfHandlers } from './proto/vrf/Vrf'
 import { VRFInput } from './proto/vrf/VRFInput'
@@ -22,6 +23,7 @@ const server: VrfHandlers = {
       logger.info('VRF proof generated', { proof: proof.toString('hex') })
       callback(null, { vrfProof: proof.toString('hex') })
     } catch (error) {
+      Sentry.captureException(error)
       logger.error(`Error generating VRF proof`, { vrfInputString, error })
       callback(new Error('Error generating proof'), null)
     }

@@ -1,13 +1,17 @@
 import 'dotenv/config'
 import * as grpc from '@grpc/grpc-js'
 import * as protoLoader from '@grpc/proto-loader'
+import * as Sentry from '@sentry/node'
 import path from 'path'
 import { ProtoGrpcType } from './proto/vrf'
-
-const PROTO_PATH = path.join(__dirname, './proto/vrf.proto')
-
 import logger from './logger'
 import handlers from './server'
+
+Sentry.init({
+  environment: process.env.NODE_ENV,
+})
+
+const PROTO_PATH = path.join(__dirname, './proto/vrf.proto')
 
 const grpcAddress = `${process.env.GRPC_ADDRESS}:${process.env.GRPC_PORT}`
 
@@ -18,6 +22,7 @@ const startServer = () => {
   server.addService(proto.vrf.Vrf.service, handlers)
   server.bindAsync(grpcAddress, grpc.ServerCredentials.createInsecure(), (error) => {
     if (error) {
+      Sentry.captureException(error)
       throw error
     }
     server.start()

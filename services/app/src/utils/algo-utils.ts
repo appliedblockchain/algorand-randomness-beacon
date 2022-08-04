@@ -1,6 +1,7 @@
 import algosdk from 'algosdk'
 import fs from 'fs'
 import { TealKeyValue } from 'algosdk/dist/types/src/client/v2/algod/models/types'
+import { Logger } from 'winston'
 
 const client = new algosdk.Algodv2(process.env.ALGOD_TOKEN as string, process.env.ALGOD_SERVER, process.env.ALGOD_PORT)
 
@@ -43,7 +44,7 @@ export const getGlobalStateValue = async (key: string): Promise<string | number 
   return getValueFromKeyValue(keyValue)
 }
 
-const getServiceAccount = async (): Promise<algosdk.Account> => {
+const getServiceAccount = (): algosdk.Account => {
   const { SERVICE_PRIVATE_KEY, SERVICE_ADDRESS } = process.env
   return {
     sk: new Uint8Array(Buffer.from(SERVICE_PRIVATE_KEY as string, 'hex')),
@@ -51,39 +52,38 @@ const getServiceAccount = async (): Promise<algosdk.Account> => {
   }
 }
 
-const executeAbiContract = async (method: string, methodArgs: algosdk.ABIArgument[]) => {
-  // Get account from sandbox
+const executeAbiContract = async (
+  method: string,
+  methodArgs: algosdk.ABIArgument[],
+  logger: Logger,
+): Promise<{
+  confirmedRound: number
+  txIDs: string[]
+  methodResults: algosdk.ABIResult[]
+}> => {
   const serviceAccount = await getServiceAccount()
 
-  const appId = parseInt(fs.readFileSync(process.env.APP_ID as string).toString())
+  const appId = parseInt(process.env.APP_ID as string)
 
-  // We initialize the common parameters here, they'll be passed to all the transactions
-  // since they happen to be the same
   const sp = await client.getTransactionParams().do()
-  const commonParams = {
+  const comp = new algosdk.AtomicTransactionComposer()
+
+  comp.addMethodCall({
+    method: contract.getMethodByName(method),
+    methodArgs,
     appID: appId,
     sender: serviceAccount.addr,
     suggestedParams: sp,
     signer: algosdk.makeBasicAccountTransactionSigner(serviceAccount),
-  }
-
-  const comp = new algosdk.AtomicTransactionComposer()
-
-  // Simple ABI Calls with standard arguments, return type
-  comp.addMethodCall({
-    method: contract.getMethodByName(method),
-    methodArgs,
-    ...commonParams,
   })
 
-  // Finally, execute the composed group and print out the results
   const results = await comp.execute(client, 2)
   for (const result of results.methodResults) {
-    console.log(`${result.method.name} => ${result.returnValue}`)
+    logger.debug(`${result.method.name} => ${result.returnValue}`)
   }
   return results
 }
 
-export const submitValue = async (blockNumber: number, blockSeed: string, vrfOutput: string) => {
-  await executeAbiContract('submit', [blockNumber, vrfOutput])
+export const submitValue = async (blockNumber: number, blockSeed: string, vrfOutput: string, logger: Logger) => {
+  return await executeAbiContract('submit', [blockNumber, vrfOutput], logger)
 }

@@ -28,7 +28,7 @@ export const getGlobalState = async (): Promise<TealKeyValue[]> => {
 export const getValueFromKeyValue = (kv: TealKeyValue, decode = true) => {
   return {
     [1]: decode ? Buffer.from(kv.value.bytes, 'base64').toString() : Buffer.from(kv.value.bytes, 'base64'),
-    [2]: kv.value.uint
+    [2]: kv.value.uint,
   }[Number(kv.value.type)]
 }
 
@@ -85,5 +85,5 @@ const executeAbiContract = async (method: string, methodArgs: algosdk.ABIArgumen
 }
 
 export const submitValue = async (blockNumber: number, blockSeed: string, vrfOutput: string) => {
-  await executeAbiContract('submit', [1])
+  await executeAbiContract('submit', [blockNumber, vrfOutput])
 }

@@ -5,10 +5,10 @@ import { BLOCK_INTERVAL } from './constants'
 import { generateProof } from './utils/grpc-client'
 import { VRFInput } from './proto/vrf/VRFInput'
 
-const getProofHash = async (vrfInput: string): Promise<string | undefined> => {
+const getVrfProof = async (vrfInput: string): Promise<string | undefined> => {
   try {
     const result = await generateProof({ vrfInput } as VRFInput)
-    return result.proofHash
+    return result.vrfProof
   } catch (error) {
     logger.error(error)
   }
@@ -36,8 +36,8 @@ const mainFlow = async () => {
     const vrfInput = buildVrfInput(lastRound, blockSeed)
 
     logger.info('Getting the proof hash', { vrfInput })
-    const hash = await getProofHash(vrfInput)
-    logger.debug({ lastRound, blockSeed, vrfInput, hash })
+    const vrfProof = await getVrfProof(vrfInput)
+    logger.debug({ lastRound, blockSeed, vrfInput, vrfProof })
   } catch (error) {
     logger.error(error)
   }

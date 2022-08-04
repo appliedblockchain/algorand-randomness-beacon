@@ -42,54 +42,17 @@ export const getGlobalStateValue = async (key: string): Promise<string | number 
   return getValueFromKeyValue(keyValue)
 }
 
-const getAccountsFromKmd = async (): Promise<algosdk.Account[]> => {
-  const { KMD_TOKEN, KMD_HOST, KMD_PORT, KMD_WALLET, KMD_PASSWORD } = process.env
-  const kmdClient = new algosdk.Kmd(KMD_TOKEN, KMD_HOST, KMD_PORT)
-
-  const wallets = await kmdClient.listWallets()
-
-  let walletId
-  for (const wallet of wallets['wallets']) {
-    if (wallet['name'] === KMD_WALLET) {
-      walletId = wallet['id']
-    }
+const getServiceAccount = async (): Promise<algosdk.Account> => {
+  const { SERVICE_PRIVATE_KEY, SERVICE_ADDRESS } = process.env
+  return {
+    sk: new Uint8Array(Buffer.from(SERVICE_PRIVATE_KEY as string, 'hex')),
+    addr: SERVICE_ADDRESS,
   }
-
-  if (walletId === undefined) {
-    throw Error('No wallet named: ' + KMD_WALLET)
-  }
-
-  const handleResp = await kmdClient.initWalletHandle(walletId, KMD_PASSWORD)
-  const handle = handleResp['wallet_handle_token']
-
-  const addresses = await kmdClient.listKeys(handle)
-  const acctPromises = []
-  for (const addr of addresses['addresses']) {
-    acctPromises.push(kmdClient.exportKey(handle, KMD_PASSWORD, addr))
-  }
-  const keys = await Promise.all(acctPromises)
-
-  kmdClient.releaseWalletHandle(handle)
-
-  return keys.map((k) => {
-    const addr = algosdk.encodeAddress(k.private_key.slice(32))
-    const acct = { sk: k.private_key, addr: addr } as algosdk.Account
-    return acct
-  })
 }
 
-const executeAbiContract = async (
-  contractPath: string,
-  method: string,
-  methodArgs: algosdk.ABIArgument[],
-  account?: algosdk.Account
-) => {
-  let acct
-  if (!account) {
-    // Get account from sandbox
-    const accounts = await getAccountsFromKmd()
-    acct = accounts[0]
-  }
+const executeAbiContract = async (contractPath: string, method: string, methodArgs: algosdk.ABIArgument[]) => {
+  // Get account from sandbox
+  const serviceAccount = await getServiceAccount()
 
   // Read in the local contract.json file
   const buff = fs.readFileSync(contractPath)
@@ -104,9 +67,9 @@ const executeAbiContract = async (
   const sp = await client.getTransactionParams().do()
   const commonParams = {
     appID: appId,
-    sender: acct.addr,
+    sender: serviceAccount.addr,
     suggestedParams: sp,
-    signer: algosdk.makeBasicAccountTransactionSigner(acct)
+    signer: algosdk.makeBasicAccountTransactionSigner(serviceAccount),
   }
 
   const comp = new algosdk.AtomicTransactionComposer()
@@ -115,7 +78,7 @@ const executeAbiContract = async (
   comp.addMethodCall({
     method: abiContract.getMethodByName(method),
     methodArgs,
-    ...commonParams
+    ...commonParams,
   })
 
   // Finally, execute the composed group and print out the results
@@ -123,8 +86,9 @@ const executeAbiContract = async (
   for (const result of results.methodResults) {
     console.log(`${result.method.name} => ${result.returnValue}`)
   }
+  return results
 }
 
 export const submitValue = async (blockNumber: number, blockSeed: string, vrfOutput: string) => {
-  await executeAbiContract('../contract.json', 'foo', [ 1 ])
+  await executeAbiContract('../contract.json', 'foo', [1])
 }

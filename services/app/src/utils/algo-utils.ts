@@ -61,7 +61,7 @@ const executeAbiContract = async (
   txIDs: string[]
   methodResults: algosdk.ABIResult[]
 }> => {
-  const serviceAccount = await getServiceAccount()
+  const serviceAccount = getServiceAccount()
 
   const appId = parseInt(process.env.APP_ID as string)
 

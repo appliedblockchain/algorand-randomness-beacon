@@ -1,12 +1,14 @@
 import * as Sentry from '@sentry/node'
 import { getBlockSeed, getLastRound } from './utils/algo-utils'
 import buildVrfInput from './utils/vrf'
-import logger from './logger'
+import parentLogger from './logger'
 import { BLOCK_INTERVAL } from './constants'
 import { generateProof } from './utils/grpc-client'
 import { VRFInput } from './proto/vrf/VRFInput'
+import { randomUUID } from 'crypto'
+import { Logger } from 'winston'
 
-const getVrfProof = async (vrfInput: string): Promise<string | undefined> => {
+const getVrfProof = async (vrfInput: string, logger: Logger): Promise<string | undefined> => {
   try {
     const result = await generateProof({ vrfInput } as VRFInput)
     return result.vrfProof
@@ -16,6 +18,7 @@ const getVrfProof = async (vrfInput: string): Promise<string | undefined> => {
 }
 
 const mainFlow = async () => {
+  const logger = parentLogger.child({ traceId: randomUUID() })
   try {
     logger.info('Getting last round')
     const lastRound = await getLastRound()
@@ -37,7 +40,7 @@ const mainFlow = async () => {
     const vrfInput = buildVrfInput(lastRound, blockSeed)
 
     logger.info('Getting the proof hash', { vrfInput })
-    const vrfProof = await getVrfProof(vrfInput)
+    const vrfProof = await getVrfProof(vrfInput, logger)
     logger.debug({ lastRound, blockSeed, vrfInput, vrfProof })
   } catch (error) {
     Sentry.captureException(error)

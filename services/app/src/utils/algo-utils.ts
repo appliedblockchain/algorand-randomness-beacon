@@ -4,7 +4,8 @@ import { TealKeyValue } from 'algosdk/dist/types/src/client/v2/algod/models/type
 
 const client = new algosdk.Algodv2(process.env.ALGOD_TOKEN as string, process.env.ALGOD_SERVER, process.env.ALGOD_PORT)
 
-const contractBuff = fs.readFileSync('../contract.json')
+const contractPath = '../contract.json'
+const contractBuff = fs.readFileSync(contractPath)
 export const contract = new algosdk.ABIContract(JSON.parse(contractBuff.toString()))
 
 export const getLastRound = async (): Promise<number> => {
@@ -50,15 +51,9 @@ const getServiceAccount = async (): Promise<algosdk.Account> => {
   }
 }
 
-const executeAbiContract = async (contractPath: string, method: string, methodArgs: algosdk.ABIArgument[]) => {
+const executeAbiContract = async (method: string, methodArgs: algosdk.ABIArgument[]) => {
   // Get account from sandbox
   const serviceAccount = await getServiceAccount()
-
-  // Read in the local contract.json file
-  const buff = fs.readFileSync(contractPath)
-
-  // Parse the json file into an object, pass it to create an ABIContract object
-  const abiContract = new algosdk.ABIContract(JSON.parse(buff.toString()))
 
   const appId = parseInt(fs.readFileSync(process.env.APP_ID as string).toString())
 
@@ -76,7 +71,7 @@ const executeAbiContract = async (contractPath: string, method: string, methodAr
 
   // Simple ABI Calls with standard arguments, return type
   comp.addMethodCall({
-    method: abiContract.getMethodByName(method),
+    method: contract.getMethodByName(method),
     methodArgs,
     ...commonParams,
   })
@@ -90,5 +85,5 @@ const executeAbiContract = async (contractPath: string, method: string, methodAr
 }
 
 export const submitValue = async (blockNumber: number, blockSeed: string, vrfOutput: string) => {
-  await executeAbiContract('../contract.json', 'foo', [1])
+  await executeAbiContract('submit', [1])
 }

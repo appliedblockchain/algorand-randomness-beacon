@@ -6,6 +6,7 @@ import { join } from 'path'
 import { BLOCK_INTERVAL, STARTING_ROUND } from '../constants'
 
 const client = new algosdk.Algodv2(process.env.ALGOD_TOKEN as string, process.env.ALGOD_SERVER, process.env.ALGOD_PORT)
+const serviceAccount = algosdk.mnemonicToSecretKey(process.env.SERVICE_MEMONIC as string)
 
 const contractPath = join(__dirname, '../contract.json')
 const contractBuff = fs.readFileSync(contractPath)
@@ -46,14 +47,6 @@ export const getGlobalStateValue = async (key: string): Promise<string | number 
   return getValueFromKeyValue(keyValue)
 }
 
-const getServiceAccount = (): algosdk.Account => {
-  const { SERVICE_PRIVATE_KEY, SERVICE_ADDRESS } = process.env
-  return {
-    sk: new Uint8Array(Buffer.from(SERVICE_PRIVATE_KEY as string, 'hex')),
-    addr: SERVICE_ADDRESS,
-  }
-}
-
 const executeAbiContract = async (
   method: string,
   methodArgs: algosdk.ABIArgument[],
@@ -63,8 +56,6 @@ const executeAbiContract = async (
   txIDs: string[]
   methodResults: algosdk.ABIResult[]
 }> => {
-  const serviceAccount = getServiceAccount()
-
   const appId = parseInt(process.env.APP_ID as string)
 
   const sp = await client.getTransactionParams().do()

@@ -6,7 +6,8 @@ import { getVrfProof } from './utils/grpc-client'
 import { randomUUID } from 'crypto'
 
 const mainFlow = async () => {
-  const logger = parentLogger.child({ traceId: randomUUID() })
+  const traceId = randomUUID()
+  const logger = parentLogger.child({ traceId })
   try {
     const lastRound = await getLastRound()
     if (!lastRound) {
@@ -28,7 +29,7 @@ const mainFlow = async () => {
     const vrfInput = buildVrfInput(nextExpectedRound, blockSeed)
 
     logger.info('Getting the proof hash', { vrfInput })
-    const vrfProof = await getVrfProof(vrfInput, logger)
+    const vrfProof = await getVrfProof(vrfInput, logger, traceId)
     logger.debug({ nextExpectedRound, blockSeed, vrfInput, vrfProof })
 
     logger.info('Submiting the value', { vrfInput })

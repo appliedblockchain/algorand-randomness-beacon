@@ -77,7 +77,7 @@ jobs:
       - run:
           name: Run docker build
           command: |-
-            docker-compose -f docker-compose.yml up --build --force-recreate --no-deps --exit-code-from build
+            docker-compose -f docker-compose.yml build --force-recreate --no-deps --exit-code-from build
 
 workflows:
   test-services:

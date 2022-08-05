@@ -64,8 +64,24 @@ jobs:
       - store_artifacts:
           path: services/app/reports/coverage
 
+  test-build:
+    docker:
+      - image: cimg/node:lts
+        environment:
+          NODE_ENV: test
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - app-{{ checksum "services/app/package.json" }}
+      - run:
+          name: Run docker build
+          command: |-
+            docker-compose -f docker-compose.yml up --build --force-recreate --no-deps --exit-code-from build
+
 workflows:
   test-services:
     jobs:
       - test-app
       - test-vrf
+      - test-build

@@ -10,7 +10,8 @@ import { vrfProve } from './utils/libsodium-wrapper'
 
 const server: VrfHandlers = {
   GenerateProof: async (call: grpc.ServerUnaryCall<VRFInput, VRFProof>, callback: grpc.sendUnaryData<VRFProof>) => {
-    const logger = parentLogger.child({ traceId: randomUUID() })
+    const traceId = call.metadata.get('trace-id')[0]
+    const logger = parentLogger.child({ traceId })
     const vrfInputString = Buffer.from(call.request.vrfInput).toString()
     try {
       logger.info('Generate proof handler', { vrfInputString })

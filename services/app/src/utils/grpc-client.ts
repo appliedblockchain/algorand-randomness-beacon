@@ -27,9 +27,12 @@ client.waitForReady(deadline, (error?: Error) => {
 
 const generateProof = promisify(client.generateProof.bind(client))
 
-export const getVrfProof = async (vrfInput: string, logger: Logger): Promise<string | undefined> => {
+export const getVrfProof = async (vrfInput: string, logger: Logger, traceId: string): Promise<string | undefined> => {
   try {
-    const result = await generateProof({ vrfInput } as VRFInput, { deadline: getDeadline() })
+    const metadata = new grpc.Metadata()
+    metadata.add('trace-id', traceId)
+
+    const result = await generateProof({ vrfInput } as VRFInput, metadata, { deadline: getDeadline() })
     return result.vrfProof
   } catch (error) {
     logger.error(error)

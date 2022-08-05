@@ -2,10 +2,11 @@ import algosdk from 'algosdk'
 import fs from 'fs'
 import { TealKeyValue } from 'algosdk/dist/types/src/client/v2/algod/models/types'
 import { Logger } from 'winston'
+import { join } from 'path'
 
 const client = new algosdk.Algodv2(process.env.ALGOD_TOKEN as string, process.env.ALGOD_SERVER, process.env.ALGOD_PORT)
 
-const contractPath = '../contract.json'
+const contractPath = join(__dirname, '../contract.json')
 const contractBuff = fs.readFileSync(contractPath)
 export const contract = new algosdk.ABIContract(JSON.parse(contractBuff.toString()))
 

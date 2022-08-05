@@ -3,6 +3,7 @@ import fs from 'fs'
 import { TealKeyValue } from 'algosdk/dist/types/src/client/v2/algod/models/types'
 import { Logger } from 'winston'
 import { join } from 'path'
+import { BLOCK_INTERVAL, STARTING_ROUND } from '../constants'
 
 const client = new algosdk.Algodv2(process.env.ALGOD_TOKEN as string, process.env.ALGOD_SERVER, process.env.ALGOD_PORT)
 
@@ -85,6 +86,38 @@ const executeAbiContract = async (
   return results
 }
 
-export const submitValue = async (blockNumber: number, blockSeed: string, vrfOutput: string, logger: Logger) => {
+export const submitValue = async (blockNumber: number, vrfOutput: string, logger: Logger) => {
   return await executeAbiContract('submit', [blockNumber, vrfOutput], logger)
+}
+
+/**
+ *
+ * @returns The last round accepted by the smart contract
+ */
+export const getLastRoundAcceptedBySC = async (): Promise<number> => {
+  // const stateValue = await getGlobalStateValue('last_sent_round')
+  // TODO: We will not have the round but instead need to extract
+  // the round number from this state value
+  // return stateValue as number
+
+  // For dev until we have the smart contract returns the nearest
+  // round divisible by 8 after the last round
+  const lr = await getLastRound()
+  return lr % 8 === 0 ? lr - 8 : lr - (lr % 8)
+}
+
+export const getNextExpectedRound = async (lastRound: number): Promise<number | null> => {
+  const lastRoundAcceptedBySC = await getLastRoundAcceptedBySC()
+  if (!lastRoundAcceptedBySC && STARTING_ROUND > lastRound) {
+    // It's our first transaction
+    return STARTING_ROUND
+  }
+
+  if (STARTING_ROUND > lastRound) {
+    // We shouldn't start generating values yet
+    return null
+  }
+
+  const nextExpectedRound = lastRoundAcceptedBySC + BLOCK_INTERVAL
+  return nextExpectedRound
 }

@@ -1,47 +1,46 @@
 import * as Sentry from '@sentry/node'
-import { getBlockSeed, getLastRound } from './utils/algo-utils'
+import { getBlockSeed, getLastRound, getNextExpectedRound, submitValue } from './utils/algo-utils'
 import buildVrfInput from './utils/vrf'
 import parentLogger from './logger'
-import { BLOCK_INTERVAL } from './constants'
-import { generateProof } from './utils/grpc-client'
-import { VRFInput } from './proto/vrf/VRFInput'
+import { getVrfProof } from './utils/grpc-client'
 import { randomUUID } from 'crypto'
-import { Logger } from 'winston'
-
-const getVrfProof = async (vrfInput: string, logger: Logger): Promise<string | undefined> => {
-  try {
-    const result = await generateProof({ vrfInput } as VRFInput)
-    return result.vrfProof
-  } catch (error) {
-    logger.error(error)
-  }
-}
 
 const mainFlow = async () => {
   const logger = parentLogger.child({ traceId: randomUUID() })
   try {
-    logger.info('Getting last round')
     const lastRound = await getLastRound()
     if (!lastRound) {
       throw new Error("can't get last round")
     }
-    if (lastRound % BLOCK_INTERVAL !== 0) {
-      logger.info('Ignoring last round', { lastRound })
+    const nextExpectedRound = await getNextExpectedRound(lastRound)
+    if (nextExpectedRound > lastRound) {
+      logger.info('Ignoring current round', { lastRound, nextExpectedRound })
       return
     }
 
-    logger.info(`Getting block seed for ${lastRound}`)
-    const blockSeed = await getBlockSeed(lastRound)
+    logger.info(`Getting block seed for ${nextExpectedRound}`)
+    const blockSeed = await getBlockSeed(nextExpectedRound)
     if (!blockSeed) {
-      throw new Error("can't get last round block seed")
+      throw new Error("can't get block seed")
     }
 
-    logger.info('Building VRF input', { lastRound, blockSeed })
-    const vrfInput = buildVrfInput(lastRound, blockSeed)
+    logger.info('Building VRF input', { nextExpectedRound, blockSeed })
+    const vrfInput = buildVrfInput(nextExpectedRound, blockSeed)
 
     logger.info('Getting the proof hash', { vrfInput })
     const vrfProof = await getVrfProof(vrfInput, logger)
-    logger.debug({ lastRound, blockSeed, vrfInput, vrfProof })
+    logger.debug({ nextExpectedRound, blockSeed, vrfInput, vrfProof })
+
+    logger.info('Submiting the value', { vrfInput })
+    const submitResult = await submitValue(nextExpectedRound, vrfProof, logger)
+
+    logger.debug('Random value submitted', {
+      nextExpectedRound,
+      blockSeed,
+      vrfInput,
+      vrfProof,
+      confirmedRound: submitResult.confirmedRound,
+    })
   } catch (error) {
     Sentry.captureException(error)
     logger.error(error)

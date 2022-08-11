@@ -73,9 +73,6 @@ jobs:
       - checkout
       - setup_remote_docker:
           version: 20.10.2
-      - restore_cache:
-          keys:
-            - app-{{ checksum "services/app/package.json" }}
       - run:
           name: Run docker build
           command: |-

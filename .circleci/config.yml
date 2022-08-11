@@ -64,8 +64,23 @@ jobs:
       - store_artifacts:
           path: services/app/reports/coverage
 
+  test-build:
+    docker:
+      - image: cimg/node:lts
+        environment:
+          NODE_ENV: test
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 20.10.2
+      - run:
+          name: Run docker build
+          command: |-
+            docker-compose -f docker-compose.yml build
+
 workflows:
   test-services:
     jobs:
       - test-app
       - test-vrf
+      - test-build

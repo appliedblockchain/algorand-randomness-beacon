@@ -3,7 +3,7 @@ version: '3.8'
 services:
   app:
     hostname: algorand-randomness-beacon-app
-    image: appliedblockchain/algorand-randomness-beacon-app:latest
+    image: appliedblockchain/algorand-randomness-beacon-app:dev
     build:
       context: ./services/app
       dockerfile: ./Dockerfile.dev
@@ -18,7 +18,7 @@ services:
 
   vrf:
     hostname: algorand-randomness-beacon-vrf
-    image: appliedblockchain/algorand-randomness-beacon-vrf:latest
+    image: appliedblockchain/algorand-randomness-beacon-vrf:dev
     build:
       context: ./services/vrf
       dockerfile: ./Dockerfile.dev

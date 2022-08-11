@@ -7,7 +7,7 @@ message VRFInput {
 }
 
 message VRFProof {
-  string proofHash = 1;
+  string vrf_proof = 1;
 }
 
 service Vrf {

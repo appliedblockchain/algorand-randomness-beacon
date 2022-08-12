@@ -3,9 +3,9 @@
 echo "Generating temporary manifest with secrets."
 cp app-env-vars.secrets.txt app-env-vars.secrets-tmp.yaml
 sed -i "s^{{ALGOD_TOKEN}}^$ALGOD_TOKEN^g" app-env-vars.secrets-tmp.yaml
-sed -i "s^{{SERVICE_KEY}}^$SERVICE_KEY^g" app-env-vars.secrets-tmp.yaml
+sed -i "s^{{SERVICE_MNEMONIC}}^$SERVICE_MNEMONIC^g" app-env-vars.secrets-tmp.yaml
 sed -i "s^{{AWS_SECRET_ACCESS_KEY}}^$AWS_SECRET_ACCESS_KEY^g" app-env-vars.secrets-tmp.yaml
-sed -i "s^{{VRF_SECRET_KEY}}^$VRF_SECRET_KEY^g" app-env-vars.secrets-tmp.yaml
+sed -i "s^{{VRF_ENCRYPTED_KEY}}^$VRF_ENCRYPTED_KEY^g" app-env-vars.secrets-tmp.yaml
 
 echo "Applying secrets"
 

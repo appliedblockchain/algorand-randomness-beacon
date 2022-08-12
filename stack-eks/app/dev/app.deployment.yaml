@@ -6,7 +6,7 @@ metadata:
   name: app
   namespace: app
 spec:
-  replicas: 1
+  replicas: 2
   revisionHistoryLimit: 3
   selector:
     matchLabels:
@@ -23,32 +23,54 @@ spec:
           image: appliedblockchain/algorand-randomness-beacon-app:latest
           imagePullPolicy: Always
           env:
+          - name: SERVICE
+            value: "app"
           - name: NODE_ENV
-            value: ""
+            value: "development"
           - name: LOG_LEVEL
-            value: ""
+            value: "debug"
           - name: ALGOD_TOKEN
             valueFrom:
               secretKeyRef:
                 name: app-env-vars
                 key: ALGOD_TOKEN
           - name: ALGOD_SERVER
-            value: ""
+            value: "https://betanet-algod.appliedblockchain.com"
           - name: ALGOD_PORT
+            value: "8080"
+          - name: APP_CREATOR_ADDRESS
             value: ""
           - name: APP_ID
             value: ""
-          - name: SERVICE_KEY
-            valueFrom:
-              secretKeyRef:
-                name: app-env-vars
-                key: SERVICE_KEY
           - name: STARTING_ROUND
             value: ""
           - name: VRF_GRPC_HOST
-            value: "vrf-hostname"
+            value: "dns:vrf.app.svc:50051"
           - name: "SENTRY_DSN"
             value: "https://0cdc8ad8aea54dbbbad3dd3b7bec531f@o1305787.ingest.sentry.io/6622570"
+          - name: SERVICE_MNEMONIC
+            valueFrom:
+              secretKeyRef:
+                name: app-env-vars
+                key: SERVICE_MNEMONIC
+          - name: DD_ENV
+            value: "local"
+          - name: DD_VERSION
+            value: "0.0.1"
+          - name: DD_AGENT_HOST
+            value: "datadog-agent.kube-system.svc"
+          - name: DD_TRACE_AGENT_PORT
+            value: "8126"
+          - name: DD_LOGS_INJECTION
+            value: "true"
+          - name: MOST_DISTANT_ROUNDS_ALLOWED
+            value: 1016""
+          - name: BLOCK_INTERVAL
+            value: "8"
+          - name: MAIN_LOOP_INTERVAL
+            value: "1000"
+          - name: APP_CREATOR_ADDRESS
+            value: ""
           resources:
             requests:
               cpu: 200m

@@ -10,16 +10,21 @@ services:
     depends_on:
       - vrf
     environment:
-      - NODE_ENV=${GIT_HANODE_ENVSH_VERSION}
+      - SERVICE=${SERVICE}
+      - NODE_ENV=${NODE_ENV}
       - LOG_LEVEL=${LOG_LEVEL}
       - ALGOD_TOKEN=${ALGOD_TOKEN}
       - ALGOD_SERVER=${ALGOD_SERVER}
       - ALGOD_PORT=${ALGOD_PORT}
+      - APP_CREATOR_ADDRESS=${APP_CREATOR_ADDRESS}
       - APP_ID=${APP_ID}
-      - SERVICE_MEMONIC=${SERVICE_MEMONIC}
       - STARTING_ROUND=${STARTING_ROUND}
       - VRF_GRPC_HOST=${VRF_GRPC_HOST}
       - SENTRY_DSN=${SENTRY_DSN}
+      - SERVICE_MNEMONIC=${SERVICE_MNEMONIC}
+      - MOST_DISTANT_ROUNDS_ALLOWED=${MOST_DISTANT_ROUNDS_ALLOWED}
+      - BLOCK_INTERVAL=${BLOCK_INTERVAL}
+      - MAIN_LOOP_INTERVAL=${MAIN_LOOP_INTERVAL}
 
   vrf:
     hostname: algorand-randomness-beacon-vrf
@@ -28,6 +33,7 @@ services:
       context: ./services/vrf
       dockerfile: ./Dockerfile
     environment:
+      - SERVICE=${SERVICE}
       - NODE_ENV=${GIT_HANODE_ENVSH_VERSION}
       - LOG_LEVEL=${LOG_LEVEL}
       - AWS_REGION=${AWS_REGION}

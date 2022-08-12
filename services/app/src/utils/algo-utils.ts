@@ -3,10 +3,20 @@ import fs from 'fs'
 import { TealKeyValue } from 'algosdk/dist/types/src/client/v2/algod/models/types'
 import { Logger } from 'winston'
 import { join } from 'path'
-import { BLOCK_INTERVAL, STARTING_ROUND } from '../constants'
+const {
+  ALGOD_TOKEN,
+  ALGOD_SERVER,
+  APP_CREATOR_ADDRESS,
+  ALGOD_PORT,
+  BLOCK_INTERVAL,
+  MOST_DISTANT_ROUNDS_ALLOWED,
+  SERVICE_MNEMONIC,
+  STARTING_ROUND,
+} = process.env
 
-const client = new algosdk.Algodv2(process.env.ALGOD_TOKEN as string, process.env.ALGOD_SERVER, process.env.ALGOD_PORT)
-const serviceAccount = algosdk.mnemonicToSecretKey(process.env.SERVICE_MEMONIC as string)
+const client = new algosdk.Algodv2(ALGOD_TOKEN, ALGOD_SERVER, ALGOD_PORT)
+
+const serviceAccount = algosdk.mnemonicToSecretKey(SERVICE_MNEMONIC)
 
 const contractPath = join(__dirname, '../contract.json')
 const contractBuff = fs.readFileSync(contractPath)
@@ -24,7 +34,7 @@ export const getBlockSeed = async (round: number): Promise<string> => {
 
 export const getGlobalState = async (): Promise<TealKeyValue[]> => {
   const applicationInfoResponse = await client
-    .accountApplicationInformation(process.env.APP_CREATOR_ADDRESS as string, Number(process.env.APP_ID as string))
+    .accountApplicationInformation(APP_CREATOR_ADDRESS as string, +process.env.APP_ID)
     .do()
   return applicationInfoResponse['created-app']['global-state']
 }
@@ -44,7 +54,7 @@ export const getGlobalStateValue = async (key: string): Promise<string | number 
     throw new Error('Key not found')
   }
 
-  return getValueFromKeyValue(keyValue)
+  return getValueFromKeyValue(keyValue, false)
 }
 
 const executeAbiContract = async (
@@ -56,7 +66,7 @@ const executeAbiContract = async (
   txIDs: string[]
   methodResults: algosdk.ABIResult[]
 }> => {
-  const appId = parseInt(process.env.APP_ID as string)
+  const appId = parseInt(process.env.APP_ID)
 
   const sp = await client.getTransactionParams().do()
   const comp = new algosdk.AtomicTransactionComposer()
@@ -85,8 +95,16 @@ export const submitValue = async (blockNumber: number, vrfOutput: string, logger
  *
  * @returns The last round accepted by the smart contract
  */
-export const getLastRoundAcceptedBySC = async (): Promise<number> => {
-  // const stateValue = await getGlobalStateValue('last_sent_round')
+export const getLastRoundAcceptedBySC = async (): Promise<number | null> => {
+  // const lastSentRoundBuffer = (await getGlobalStateValue('last_sent_round')) as Buffer
+  // const lastSentRoundHex = lastSentBuffer.toString('hex', 0, 8)
+  // const lastSentRound = parseInt(lastSentRoundHex, 16)
+  // if (isNaN(lastSentRound)) {
+  //   throw new Error('Invalid last sent round')
+  // }
+
+  // return +lastSentRound
+
   // TODO: We will not have the round but instead need to extract
   // the round number from this state value
   // return stateValue as number
@@ -99,16 +117,25 @@ export const getLastRoundAcceptedBySC = async (): Promise<number> => {
 
 export const getNextExpectedRound = async (lastRound: number): Promise<number | null> => {
   const lastRoundAcceptedBySC = await getLastRoundAcceptedBySC()
-  if (!lastRoundAcceptedBySC && STARTING_ROUND > lastRound) {
+  if (!lastRoundAcceptedBySC && +STARTING_ROUND <= lastRound) {
     // It's our first transaction
-    return STARTING_ROUND
+    return +STARTING_ROUND
   }
 
-  if (STARTING_ROUND > lastRound) {
+  if (+STARTING_ROUND > lastRound) {
     // We shouldn't start generating values yet
     return null
   }
 
-  const nextExpectedRound = lastRoundAcceptedBySC + BLOCK_INTERVAL
+  // There was a disaster. We will return the last block - 1000 - 16 nearest mod 8
+  const recoverUntilRound = lastRound - +MOST_DISTANT_ROUNDS_ALLOWED
+
+  // Closest valid round greater than the last round until when we can send the tx
+  if (lastRoundAcceptedBySC < recoverUntilRound) {
+    const closestValidRound = recoverUntilRound + +BLOCK_INTERVAL - (recoverUntilRound % +BLOCK_INTERVAL)
+    return recoverUntilRound % +BLOCK_INTERVAL === 0 ? recoverUntilRound : closestValidRound
+  }
+
+  const nextExpectedRound = lastRoundAcceptedBySC + +BLOCK_INTERVAL
   return nextExpectedRound
 }

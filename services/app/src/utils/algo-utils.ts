@@ -54,7 +54,7 @@ export const getGlobalStateValue = async (key: string): Promise<string | number 
     throw new Error('Key not found')
   }
 
-  return getValueFromKeyValue(keyValue)
+  return getValueFromKeyValue(keyValue, false)
 }
 
 const executeAbiContract = async (
@@ -95,8 +95,16 @@ export const submitValue = async (blockNumber: number, vrfOutput: string, logger
  *
  * @returns The last round accepted by the smart contract
  */
-export const getLastRoundAcceptedBySC = async (): Promise<number> => {
-  // const stateValue = await getGlobalStateValue('last_sent_round')
+export const getLastRoundAcceptedBySC = async (): Promise<number | null> => {
+  // const lastSentRoundBuffer = (await getGlobalStateValue('last_sent_round')) as Buffer
+  // const lastSentRoundHex = lastSentBuffer.toString('hex', 0, 8)
+  // const lastSentRound = parseInt(lastSentRoundHex, 16)
+  // if (isNaN(lastSentRound)) {
+  //   throw new Error('Invalid last sent round')
+  // }
+
+  // return +lastSentRound
+
   // TODO: We will not have the round but instead need to extract
   // the round number from this state value
   // return stateValue as number

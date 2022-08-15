@@ -16,7 +16,7 @@ const client = new AWS.KMS({
 
 client
   .encrypt({
-    Plaintext: pk,
+    Plaintext: sk,
     KeyId: process.env.AWS_KMS_KEY_ID,
   })
   .then((result) => {

@@ -96,23 +96,14 @@ export const submitValue = async (blockNumber: number, vrfOutput: string, logger
  * @returns The last round accepted by the smart contract
  */
 export const getLastRoundAcceptedBySC = async (): Promise<number | null> => {
-  // const lastSentRoundBuffer = (await getGlobalStateValue('last_sent_round')) as Buffer
-  // const lastSentRoundHex = lastSentBuffer.toString('hex', 0, 8)
-  // const lastSentRound = parseInt(lastSentRoundHex, 16)
-  // if (isNaN(lastSentRound)) {
-  //   throw new Error('Invalid last sent round')
-  // }
+  const lastSentRoundBuffer = (await getGlobalStateValue('')) as Buffer
+  const lastSentRoundHex = lastSentRoundBuffer.toString('hex', 0, 8)
+  const lastSentRound = parseInt(lastSentRoundHex, 16)
+  if (isNaN(lastSentRound)) {
+    throw new Error('Invalid last sent round')
+  }
 
-  // return +lastSentRound
-
-  // TODO: We will not have the round but instead need to extract
-  // the round number from this state value
-  // return stateValue as number
-
-  // For dev until we have the smart contract returns the nearest
-  // round divisible by 8 after the last round
-  const lr = await getLastRound()
-  return lr % 8 === 0 ? lr - 8 : lr - (lr % 8)
+  return +lastSentRound
 }
 
 export const getNextExpectedRound = async (lastRound: number): Promise<number | null> => {

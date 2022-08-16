@@ -6,7 +6,7 @@ metadata:
   name: app
   namespace: app
 spec:
-  replicas: 2
+  replicas: 1
   revisionHistoryLimit: 3
   selector:
     matchLabels:
@@ -69,8 +69,6 @@ spec:
             value: "8"
           - name: MAIN_LOOP_INTERVAL
             value: "1000"
-          - name: APP_CREATOR_ADDRESS
-            value: ""
           resources:
             requests:
               cpu: 200m

@@ -13,7 +13,7 @@ FROM node@sha256:9a2db0008b592cfde1b98aa8972a8051ccb80bb51dde8b06c3a2e3762794e89
 RUN apk add dumb-init
 ENV NODE_ENV production
 WORKDIR /usr/src/app
-COPY --chown=node:node ./package*.json /usr/src/app
+COPY --chown=node:node ./package*.json /usr/src/app/
 COPY --from=builder --chown=node:node /usr/src/app/dist /usr/src/app/dist
 COPY --from=builder --chown=node:node /usr/src/app/node_modules /usr/src/app/node_modules
 COPY --chown=node:node ./src/proto/vrf.proto /usr/src/app/dist/proto/vrf.proto

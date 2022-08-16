@@ -20,5 +20,6 @@ client
     KeyId: process.env.AWS_KMS_KEY_ID,
   })
   .then((result) => {
-    console.log(Buffer.from(result.CiphertextBlob).toString('base64'))
+    console.log('Public key: ', pk.toString('hex'))
+    console.log('Encripted secret key: ', Buffer.from(result.CiphertextBlob).toString('base64'))
   })

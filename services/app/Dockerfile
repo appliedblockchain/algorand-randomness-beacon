@@ -11,6 +11,7 @@ ENV NODE_ENV production
 WORKDIR /usr/src/app
 COPY --chown=node:node ./package*.json /usr/src/app/
 COPY --from=builder --chown=node:node /usr/src/app/dist /usr/src/app/dist
+COPY --chown=node:node ./src/contract.json /usr/src/app/dist/contract.json
 COPY --chown=node:node ./src/proto/vrf.proto /usr/src/app/dist/proto/vrf.proto
 RUN npm ci --only=production
 

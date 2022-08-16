@@ -34,16 +34,21 @@ const mainFlow = async () => {
     const vrfProof = await getVrfProof(vrfInput, logger, traceId)
     logger.debug({ nextExpectedRound, blockSeed, vrfInput, vrfProof })
 
-    logger.info('Submiting the value', { vrfInput })
-    const submitResult = await submitValue(nextExpectedRound, vrfProof, logger)
-
-    logger.debug('Random value submitted', {
-      nextExpectedRound,
-      blockSeed,
-      vrfInput,
-      vrfProof,
-      confirmedRound: submitResult.confirmedRound,
-    })
+    try {
+      logger.info('Submiting the value', { vrfInput })
+      const submitResult = await submitValue(nextExpectedRound, vrfProof, logger)
+      logger.debug('Random value submitted', {
+        lastRound,
+        nextExpectedRound,
+        confirmedRound: submitResult.confirmedRound,
+        blockSeed,
+        vrfInput,
+        vrfProof,
+      })
+    } catch (error) {
+      // TODO: Handle error
+      logger.error(error)
+    }
   } catch (error) {
     Sentry.captureException(error)
     logger.error(error)
@@ -52,7 +57,7 @@ const mainFlow = async () => {
 }
 
 const loop = async () => {
-  setInterval(mainFlow, 1000)
+  setInterval(mainFlow, +process.env.MAIN_LOOP_INTERVAL)
 }
 
 export default loop

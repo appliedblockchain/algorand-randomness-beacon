@@ -4,8 +4,10 @@ import buildVrfInput from './utils/vrf'
 import parentLogger from './logger'
 import { getVrfProof } from './utils/grpc-client'
 import { randomUUID } from 'crypto'
+import tracer from './utils/tracer'
 
 const mainFlow = async () => {
+  const span = tracer.startSpan('main-flow')
   const traceId = randomUUID()
   const logger = parentLogger.child({ traceId })
   try {
@@ -46,6 +48,7 @@ const mainFlow = async () => {
     Sentry.captureException(error)
     logger.error(error)
   }
+  span.finish()
 }
 
 const loop = async () => {

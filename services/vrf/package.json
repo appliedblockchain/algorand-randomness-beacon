@@ -1,5 +1,5 @@
 {
-  "name": "vrf-generator",
+  "name": "randomness-beacon-vrf",
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
@@ -19,6 +19,7 @@
     "@grpc/grpc-js": "1.6.8",
     "@grpc/proto-loader": "0.7.0",
     "@sentry/node": "7.8.1",
+    "dd-trace": "2.12.2",
     "dotenv": "16.0.1",
     "winston": "3.8.1"
   },

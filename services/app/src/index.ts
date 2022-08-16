@@ -1,3 +1,4 @@
+import './utils/tracer'
 import 'dotenv/config'
 import * as Sentry from '@sentry/node'
 import loop from './loop'

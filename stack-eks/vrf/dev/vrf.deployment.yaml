@@ -52,7 +52,7 @@ spec:
           - name: SENTRY_DSN
             value: "https://0cdc8ad8aea54dbbbad3dd3b7bec531f@o1305787.ingest.sentry.io/6622570"
           - name: DD_ENV
-            value: "local"
+            value: "development randomness-oracle-env-03-eks"
           - name: DD_VERSION
             value: "0.0.1"
           - name: DD_AGENT_HOST

@@ -54,7 +54,7 @@ spec:
                 name: app-env-vars
                 key: SERVICE_MNEMONIC
           - name: DD_ENV
-            value: "local"
+            value: "development randomness-oracle-env-03-eks"
           - name: DD_VERSION
             value: "0.0.1"
           - name: DD_AGENT_HOST

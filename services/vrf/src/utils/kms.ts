@@ -26,7 +26,7 @@ const decryptVrfKey = async () => {
     CiphertextBlob: Buffer.from(process.env.VRF_ENCRYPTED_KEY, 'base64'),
   })
 
-  decryptedKey = Buffer.from(Plaintext).toString('utf-8')
+  decryptedKey = Buffer.from(Plaintext).toString('hex')
   return decryptedKey
 }
 

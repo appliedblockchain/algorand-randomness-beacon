@@ -23,23 +23,23 @@ describe('algo-utils', () => {
       expect(await algoUtils.getNextExpectedRound(5001)).toBe(5008)
     })
 
-    describe('WHEN last accepted round is too far in the past (< LAST_ROUND - 1000 -16 rounds)', () => {
+    describe('WHEN last accepted round is too far in the past (< LAST_ROUND - (1000 - 8) rounds)', () => {
       it('returns the next most distant accepted round if mod 8', async () => {
         getLastRoundAcceptedBySCMock.mockReturnValueOnce(Promise.resolve(5000))
-        expect(await algoUtils.getNextExpectedRound(10000)).toBe(8984)
+        expect(await algoUtils.getNextExpectedRound(10000)).toBe(9008)
       })
 
       it('returns the nearest mod 8 round geater than the most distant accepted round', async () => {
-        getLastRoundAcceptedBySCMock.mockReturnValueOnce(Promise.resolve(5000))
-        expect(await algoUtils.getNextExpectedRound(10001)).toBe(8992)
-        expect(await algoUtils.getNextExpectedRound(10002)).toBe(8992)
-        expect(await algoUtils.getNextExpectedRound(10003)).toBe(8992)
-        expect(await algoUtils.getNextExpectedRound(10004)).toBe(8992)
-        expect(await algoUtils.getNextExpectedRound(10005)).toBe(8992)
-        expect(await algoUtils.getNextExpectedRound(10006)).toBe(8992)
-        expect(await algoUtils.getNextExpectedRound(10007)).toBe(8992)
-        expect(await algoUtils.getNextExpectedRound(10008)).toBe(8992)
-        expect(await algoUtils.getNextExpectedRound(10009)).toBe(9000)
+        getLastRoundAcceptedBySCMock.mockReturnValue(Promise.resolve(5000))
+        expect(await algoUtils.getNextExpectedRound(10001)).toBe(9016)
+        expect(await algoUtils.getNextExpectedRound(10002)).toBe(9016)
+        expect(await algoUtils.getNextExpectedRound(10003)).toBe(9016)
+        expect(await algoUtils.getNextExpectedRound(10004)).toBe(9016)
+        expect(await algoUtils.getNextExpectedRound(10005)).toBe(9016)
+        expect(await algoUtils.getNextExpectedRound(10006)).toBe(9016)
+        expect(await algoUtils.getNextExpectedRound(10007)).toBe(9016)
+        expect(await algoUtils.getNextExpectedRound(10008)).toBe(9016)
+        expect(await algoUtils.getNextExpectedRound(10009)).toBe(9024)
       })
     })
   })

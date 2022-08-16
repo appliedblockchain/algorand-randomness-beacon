@@ -127,7 +127,7 @@ export const getNextExpectedRound = async (lastRound: number): Promise<number | 
     return null
   }
 
-  // There was a disaster. We will return the last block - 1000 - 16 nearest mod 8
+  // There was a disaster. We will return the last block - (1000 - 8) nearest mod 8
   const recoverUntilRound = lastRound - +MOST_DISTANT_ROUNDS_ALLOWED
 
   // Closest valid round greater than the last round until when we can send the tx

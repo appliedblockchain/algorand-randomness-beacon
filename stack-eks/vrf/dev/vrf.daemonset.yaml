@@ -1,17 +1,14 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: DaemonSet
 metadata:
   labels:
     app: vrf
   name: vrf
   namespace: app
 spec:
-  replicas: 1
-  revisionHistoryLimit: 3
   selector:
     matchLabels:
       app: vrf
-  strategy: {}
   template:
     metadata:
       labels:

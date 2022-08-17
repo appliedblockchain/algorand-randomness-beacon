@@ -14,7 +14,7 @@ const {
   STARTING_ROUND,
 } = process.env
 
-const client = new algosdk.Algodv2(ALGOD_TOKEN, ALGOD_SERVER, ALGOD_PORT)
+export const client = new algosdk.Algodv2(ALGOD_TOKEN, ALGOD_SERVER, ALGOD_PORT)
 
 const serviceAccount = algosdk.mnemonicToSecretKey(SERVICE_MNEMONIC)
 
@@ -129,4 +129,10 @@ export const getNextExpectedRound = async (lastRound: number): Promise<number | 
 
   const nextExpectedRound = lastRoundAcceptedBySC + +BLOCK_INTERVAL
   return nextExpectedRound
+}
+
+export const getServiceAccountBalance = async (): Promise<number> => {
+  const result = await client.accountInformation(serviceAccount.addr).do()
+
+  return result.amount
 }

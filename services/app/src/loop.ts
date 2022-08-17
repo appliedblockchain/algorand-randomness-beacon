@@ -1,10 +1,18 @@
 import * as Sentry from '@sentry/node'
-import { getBlockSeed, getLastRound, getNextExpectedRound, submitValue } from './utils/algo-utils'
+import {
+  getBlockSeed,
+  getLastRound,
+  getNextExpectedRound,
+  getServiceAccountBalance,
+  submitValue,
+} from './utils/algo-utils'
 import buildVrfInput from './utils/vrf'
 import parentLogger from './logger'
 import { getVrfProof } from './utils/grpc-client'
 import { randomUUID } from 'crypto'
 import tracer from './utils/tracer'
+
+const serviceAccountMinimumBalance = parseInt(process.env.SERVICE_ACCOUNT_MINIMUM_BALANCE, 10)
 
 const mainFlow = async () => {
   const span = tracer.startSpan('main-flow')
@@ -67,8 +75,18 @@ const mainFlow = async () => {
   span.finish()
 }
 
+export const serviceAccountBalanceAlert = async () => {
+  const serviceAccountBalance = await getServiceAccountBalance()
+  if (serviceAccountBalance < serviceAccountMinimumBalance) {
+    Sentry.captureException(new Error('Insuficient service account balance'), {
+      extra: { serviceAccountBalance, serviceAccountMinimumBalance },
+    })
+  }
+}
+
 const loop = async () => {
   setInterval(mainFlow, +process.env.MAIN_LOOP_INTERVAL)
+  setInterval(serviceAccountBalanceAlert, +process.env.MAIN_LOOP_INTERVAL)
 }
 
 export default loop

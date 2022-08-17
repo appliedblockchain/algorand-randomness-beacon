@@ -35,19 +35,30 @@ const mainFlow = async () => {
     logger.debug({ nextExpectedRound, blockSeed, vrfInput, vrfProof })
 
     try {
-      logger.info('Submiting the value', { vrfInput })
-      const submitResult = await submitValue(nextExpectedRound, vrfProof, logger)
-      logger.debug('Random value submitted', {
+      logger.info('Submiting the proof', { vrfInput })
+      const submitResult = await submitValue(nextExpectedRound, Buffer.alloc(80, vrfProof, 'hex'), logger)
+      const dataToLog = {
         lastRound,
-        nextExpectedRound,
+        submittedRound: nextExpectedRound,
         confirmedRound: submitResult.confirmedRound,
         blockSeed,
         vrfInput,
         vrfProof,
-      })
+      }
+      logger.debug('Proof submitted', dataToLog)
+      const roundsAfter = submitResult.confirmedRound - nextExpectedRound
+      if (roundsAfter > 3) {
+        logger.warning('SLA not met', dataToLog)
+        Sentry.captureException(new Error('Proof submitted outside SLA'), {
+          extra: { ...dataToLog, roundsAfter },
+        })
+      }
     } catch (error) {
-      // TODO: Handle error
-      logger.error(error)
+      if (error?.response) {
+        logger.error('Error submitting the proof', { statusCode: error.response.statusCode, body: error.response.body })
+      } else {
+        logger.error('Error submitting the proof', error)
+      }
     }
   } catch (error) {
     Sentry.captureException(error)

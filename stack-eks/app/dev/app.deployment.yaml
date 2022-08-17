@@ -39,11 +39,11 @@ spec:
           - name: ALGOD_PORT
             value: "8080"
           - name: APP_CREATOR_ADDRESS
-            value: ""
+            value: "LWOXAHEF32ISGGQSQTOFFTVSVUGJIRRFSIJYRFVL4PK4KS7MNG4SBWKYK4"
           - name: APP_ID
-            value: ""
+            value: "1135422845"
           - name: STARTING_ROUND
-            value: ""
+            value: "19955232"
           - name: VRF_GRPC_HOST
             value: "dns:vrf.app.svc:50051"
           - name: "SENTRY_DSN"

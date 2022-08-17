@@ -87,7 +87,7 @@ const executeAbiContract = async (
   return results
 }
 
-export const submitValue = async (blockNumber: number, vrfOutput: string, logger: Logger) => {
+export const submitValue = async (blockNumber: number, vrfOutput: Buffer, logger: Logger) => {
   return await executeAbiContract('submit', [blockNumber, vrfOutput], logger)
 }
 

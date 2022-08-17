@@ -1,5 +1,52 @@
 version: 2.1
 
+#Use commands to avoid steps repetition
+commands:
+  build-app:
+    steps:
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run:
+          name: build images
+          command: docker-compose -f docker-compose.yml build app
+      - run:
+          name: Login to Dockerhub
+          command: docker login -u abbuilder -p "$DOCKER_PASSWORD"
+      - run:
+          name: tag image
+          command: docker tag appliedblockchain/algorand-randomness-beacon-app:latest appliedblockchain/algorand-randomness-beacon-app:${CIRCLE_BRANCH}-${CIRCLE_SHA1}
+      - run:
+          name: Push tagged image to Dockerhub
+          command: docker push appliedblockchain/algorand-randomness-beacon-app:${CIRCLE_BRANCH}-${CIRCLE_SHA1}
+
+  deploy-kubernetes:
+    steps:
+      - attach_workspace:
+          at: /tmp/build_space/
+      - run:
+          name: Install AWS cli
+          command: export TZ=Europe/London && sudo ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > sudo  /etc/timezone && sudo apt-get update && sudo apt-get install -y awscli
+      #Need this hotfix by fixing the kubectl version as AWS changed how iam works.
+      #In aws-iam-authenticator 0.5.5 AWS changed the way it behaves in 0.5.4 to require v1beta1.
+      - run:
+          name: Install kubectl
+          #command: curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && sudo mv kubectl /usr/local/bin/ && chmod 755 /usr/local/bin/kubectl
+          command: curl -LO "https://dl.k8s.io/release/v1.23.6/bin/linux/amd64/kubectl" && sudo mv kubectl /usr/local/bin/ && chmod 755 /usr/local/bin/kubectl
+      - run:
+          name: Get kubeconfig configuration
+          command: aws eks update-kubeconfig --region $AWS_DEFAULT_REGION --name $AWS_EKS_NAME
+      - run:
+          name: Apply General manifests
+          command: |
+            cd stack-eks
+            kubectl apply -f app.namespace.yaml
+            kubectl apply -f regcred.yaml
+            kubectl apply -f regcred-blockchain.yaml
+            kubectl apply -f regcred-app.yaml
+      - run:
+          name: Run script to apply Kubernetes secrets
+          command: cd stack-eks && ./deploy-app-env-vars.sh
+
 jobs:
   test-vrf:
     docker:
@@ -78,9 +125,50 @@ jobs:
           command: |-
             docker-compose -f docker-compose.yml build
 
+  build-app-dev:
+    docker:
+      - image: cimg/node:lts
+    environment:
+          NODE_ENV: test
+    steps:
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - build-app
+
+  deploy-dev:
+    docker:
+      - image: 'cimg/base:stable'
+    environment:
+      MANIFESTS_PATH: "dev"
+    steps:
+      - run:
+          name: Set Pipeline Env Vars
+          command: |
+              echo "export AWS_ACCESS_KEY_ID=${DEV_AWS_ACCESS_KEY_ID}" >> ${BASH_ENV}
+              echo "export AWS_SECRET_ACCESS_KEY=${DEV_AWS_SECRET_ACCESS_KEY}" >> ${BASH_ENV}
+              echo "export AWS_DEFAULT_REGION=${DEV_AWS_REGION}" >> ${BASH_ENV}
+              echo "export AWS_EKS_NAME=${DEV_AWS_EKS_NAME}" >> ${BASH_ENV}
+              echo "export ALGOD_TOKEN=${DEV_ALGOD_TOKEN}" >> ${BASH_ENV}
+              echo "export SERVICE_MNEMONIC=${DEV_STRIPE_SERVICE_MNEMONIC}" >> ${BASH_ENV}
+              echo "export APP_AWS_SECRET_ACCESS_KEY=${DEV_APP_AWS_SECRET_ACCESS_KEY}" >> ${BASH_ENV}
+              echo "export VRF_ENCRYPTED_KEY=${DEV_VRF_ENCRYPTED_KEY}" >> ${BASH_ENV}
+      - deploy-kubernetes
+
 workflows:
-  test-services:
+  build_test_deploy:
     jobs:
       - test-app
       - test-vrf
-      - test-build
+      - build-app-dev
+
+      #Deploy dev
+      - deploy-dev:
+          filters:
+            branches:
+              only: main #change to dev branch
+          context:
+            - org-global
+          requires:
+            - test-app
+            - test-vrf
+            - test-build

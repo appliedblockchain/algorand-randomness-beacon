@@ -205,7 +205,7 @@ workflows:
       - build-vrf-dev:
           filters:
             branches:
-              only: developer #change to dev branch
+              only: development #change to dev branch
           context:
             - org-global
           requires:
@@ -215,7 +215,7 @@ workflows:
       - build-app-dev:
           filters:
             branches:
-              only: developer #change to dev branch
+              only: development #change to dev branch
           context:
             - org-global
           requires:
@@ -226,7 +226,7 @@ workflows:
       - deploy-dev:
           filters:
             branches:
-              only: developer #change to dev branch
+              only: development #change to dev branch
           context:
             - org-global
           requires:

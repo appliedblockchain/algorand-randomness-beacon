@@ -164,6 +164,7 @@ jobs:
       - setup_remote_docker:
           docker_layer_caching: true
           version: 20.10.2
+      - checkout
       - build-app
 
   build-vrf-dev:
@@ -175,6 +176,7 @@ jobs:
       - setup_remote_docker:
           docker_layer_caching: true
           version: 20.10.2
+      - checkout
       - build-vrf
 
   deploy-dev:

@@ -15,6 +15,9 @@ commands:
           command: docker tag appliedblockchain/algorand-randomness-beacon-vrf:latest appliedblockchain/algorand-randomness-beacon-vrf:${CIRCLE_BRANCH}-${CIRCLE_SHA1}
       - run:
           name: Push vrf tagged image to Dockerhub
+          command: docker push appliedblockchain/algorand-randomness-beacon-vrf:latest
+      - run:
+          name: Push vrf tagged image to Dockerhub
           command: docker push appliedblockchain/algorand-randomness-beacon-vrf:${CIRCLE_BRANCH}-${CIRCLE_SHA1}
 
   build-app:
@@ -28,6 +31,9 @@ commands:
       - run:
           name: tag app image
           command: docker tag appliedblockchain/algorand-randomness-beacon-app:latest appliedblockchain/algorand-randomness-beacon-app:${CIRCLE_BRANCH}-${CIRCLE_SHA1}
+      - run:
+          name: Push vrf tagged image to Dockerhub
+          command: docker push appliedblockchain/algorand-randomness-beacon-app:latest
       - run:
           name: Push app tagged image to Dockerhub
           command: docker push appliedblockchain/algorand-randomness-beacon-app:${CIRCLE_BRANCH}-${CIRCLE_SHA1}
@@ -49,6 +55,7 @@ commands:
       - run:
           name: Apply General manifests
           command: |
+            kubectl get all
             cd stack-eks
             kubectl apply -f app.namespace.yaml
             kubectl apply -f regcred.yaml
@@ -59,18 +66,22 @@ commands:
       - run:
           name: Apply vrf manifests
           command: |
-            cd stack-eks/vrf
-            /bin/sed -i "s/appliedblockchain\/algorand-randomness-beacon-vrf:latest/appliedblockchain\/algorand-randomness-beacon-vrf:${CIRCLE_BRANCH}-${CIRCLE_SHA1}/g" $MANIFESTS_PATH/vrf.daemonset.yaml
-            kubectl apply -f $MANIFESTS_PATH/vrf.daemonset.yaml
-            kubectl apply -f vrf.service.yaml
-            kubectl -n app rollout restart daemonset/vrf
-      - run:
-          name: Apply app manifests
-          command: |
-            cd stack-eks/app
-            /bin/sed -i "s/appliedblockchain\/algorand-randomness-beacon-app:latest/appliedblockchain\/algorand-randomness-beacon-app:${CIRCLE_BRANCH}-${CIRCLE_SHA1}/g" $MANIFESTS_PATH/app.daemonset.yaml
-            kubectl apply -f $MANIFESTS_PATH/app.daemonset.yaml
-            kubectl -n app rollout restart daemonset/app
+            kubectl get all
+      # - run:
+      #     name: Apply vrf manifests
+      #     command: |
+      #       cd stack-eks/vrf
+      #       /bin/sed -i "s/appliedblockchain\/algorand-randomness-beacon-vrf:latest/appliedblockchain\/algorand-randomness-beacon-vrf:${CIRCLE_BRANCH}-${CIRCLE_SHA1}/g" $MANIFESTS_PATH/vrf.daemonset.yaml
+      #       kubectl apply -f $MANIFESTS_PATH/vrf.daemonset.yaml
+      #       kubectl apply -f vrf.service.yaml
+      #       kubectl -n app rollout restart daemonset/vrf
+      # - run:
+      #     name: Apply app manifests
+      #     command: |
+      #       cd stack-eks/app
+      #       /bin/sed -i "s/appliedblockchain\/algorand-randomness-beacon-app:latest/appliedblockchain\/algorand-randomness-beacon-app:${CIRCLE_BRANCH}-${CIRCLE_SHA1}/g" $MANIFESTS_PATH/app.daemonset.yaml
+      #       kubectl apply -f $MANIFESTS_PATH/app.daemonset.yaml
+      #       kubectl -n app rollout restart daemonset/app
 
 jobs:
   test-vrf:
@@ -216,27 +227,27 @@ workflows:
       - test-app
       - test-vrf
 
-      ## Build Dev
-      - build-vrf-dev:
-          filters:
-            branches:
-              only: development #change to dev branch
-          context:
-            - org-global
-          requires:
-            - test-app
-            - test-vrf
+      # ## Build Dev
+      # - build-vrf-dev:
+      #     filters:
+      #       branches:
+      #         only: development #change to dev branch
+      #     context:
+      #       - org-global
+      #     requires:
+      #       - test-app
+      #       - test-vrf
       
-      - build-app-dev:
-          filters:
-            branches:
-              only: development #change to dev branch
-          context:
-            - org-global
-          requires:
-            - test-app
-            - test-vrf
-      ## /Build Dev
+      # - build-app-dev:
+      #     filters:
+      #       branches:
+      #         only: development #change to dev branch
+      #     context:
+      #       - org-global
+      #     requires:
+      #       - test-app
+      #       - test-vrf
+      # ## /Build Dev
 
       ## Deploy dev
       - deploy-dev:
@@ -248,6 +259,6 @@ workflows:
           requires:
             - test-app
             - test-vrf
-            - build-vrf-dev
-            - build-app-dev
+            # - build-vrf-dev
+            # - build-app-dev
       ## /Deploy dev

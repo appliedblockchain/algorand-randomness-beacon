@@ -71,14 +71,12 @@ commands:
             /bin/sed -i "s/appliedblockchain\/algorand-randomness-beacon-vrf:latest/appliedblockchain\/algorand-randomness-beacon-vrf:${CIRCLE_BRANCH}-${CIRCLE_SHA1}/g" $MANIFESTS_PATH/vrf.daemonset.yaml
             kubectl apply -f $MANIFESTS_PATH/vrf.daemonset.yaml
             kubectl apply -f vrf.service.yaml
-            kubectl -n app rollout restart daemonset/vrf
       - run:
           name: Apply app manifests
           command: |
             cd stack-eks/app
             /bin/sed -i "s/appliedblockchain\/algorand-randomness-beacon-app:latest/appliedblockchain\/algorand-randomness-beacon-app:${CIRCLE_BRANCH}-${CIRCLE_SHA1}/g" $MANIFESTS_PATH/app.daemonset.yaml
             kubectl apply -f $MANIFESTS_PATH/app.daemonset.yaml
-            kubectl -n app rollout restart daemonset/app
 
 jobs:
   test-vrf:

@@ -244,6 +244,19 @@ workflows:
             - test-vrf
       ## /Build Dev
 
+      - clean-dockerhub:
+          filters:
+            branches:
+              only: 
+                - development #change to dev branch
+                - staging #change to staging branch
+                - main #change to prod branch
+          context:
+            - org-global
+          requires:
+            - build-vrf-dev
+            - build-app-dev
+
       ## Deploy dev
       - deploy-dev:
           filters:
@@ -252,8 +265,6 @@ workflows:
           context:
             - org-global
           requires:
-            - test-app
-            - test-vrf
             - build-vrf-dev
             - build-app-dev
       ## /Deploy dev

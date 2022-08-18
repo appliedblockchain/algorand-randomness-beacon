@@ -5,6 +5,11 @@ commands:
   build-vrf:
     steps:
       - run:
+          name: check folder
+          command: |
+            ls -la
+            pwd
+      - run:
           name: build images
           command: docker-compose -f docker-compose.yml build vrf
       - run:

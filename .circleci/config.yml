@@ -226,8 +226,8 @@ jobs:
 workflows:
   build_test_deploy:
     jobs:
-      - test-app
-      - test-vrf
+      # - test-app
+      # - test-vrf
 
       # ## Build Dev
       # - build-vrf-dev:
@@ -259,8 +259,8 @@ workflows:
           context:
             - org-global
           requires:
-            - test-app
-            - test-vrf
+            # - test-app
+            # - test-vrf
             # - build-vrf-dev
             # - build-app-dev
       ## /Deploy dev

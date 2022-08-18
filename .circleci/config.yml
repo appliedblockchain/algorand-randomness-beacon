@@ -53,11 +53,6 @@ commands:
           name: Get kubeconfig configuration
           command: |
             aws eks update-kubeconfig --region $AWS_DEFAULT_REGION --name $AWS_EKS_NAME
-            kubectl get all
-      - run:
-          name: Test kubectl
-          command: |
-            kubectl get all
       - run:
           name: Apply General manifests
           command: |
@@ -69,21 +64,21 @@ commands:
       - run:
           name: Run script to apply Kubernetes secrets
           command: cd stack-eks && ./deploy-app-env-vars.sh
-      # - run:
-      #     name: Apply vrf manifests
-      #     command: |
-      #       cd stack-eks/vrf
-      #       /bin/sed -i "s/appliedblockchain\/algorand-randomness-beacon-vrf:latest/appliedblockchain\/algorand-randomness-beacon-vrf:${CIRCLE_BRANCH}-${CIRCLE_SHA1}/g" $MANIFESTS_PATH/vrf.daemonset.yaml
-      #       kubectl apply -f $MANIFESTS_PATH/vrf.daemonset.yaml
-      #       kubectl apply -f vrf.service.yaml
-      #       kubectl -n app rollout restart daemonset/vrf
-      # - run:
-      #     name: Apply app manifests
-      #     command: |
-      #       cd stack-eks/app
-      #       /bin/sed -i "s/appliedblockchain\/algorand-randomness-beacon-app:latest/appliedblockchain\/algorand-randomness-beacon-app:${CIRCLE_BRANCH}-${CIRCLE_SHA1}/g" $MANIFESTS_PATH/app.daemonset.yaml
-      #       kubectl apply -f $MANIFESTS_PATH/app.daemonset.yaml
-      #       kubectl -n app rollout restart daemonset/app
+      - run:
+          name: Apply vrf manifests
+          command: |
+            cd stack-eks/vrf
+            /bin/sed -i "s/appliedblockchain\/algorand-randomness-beacon-vrf:latest/appliedblockchain\/algorand-randomness-beacon-vrf:${CIRCLE_BRANCH}-${CIRCLE_SHA1}/g" $MANIFESTS_PATH/vrf.daemonset.yaml
+            kubectl apply -f $MANIFESTS_PATH/vrf.daemonset.yaml
+            kubectl apply -f vrf.service.yaml
+            kubectl -n app rollout restart daemonset/vrf
+      - run:
+          name: Apply app manifests
+          command: |
+            cd stack-eks/app
+            /bin/sed -i "s/appliedblockchain\/algorand-randomness-beacon-app:latest/appliedblockchain\/algorand-randomness-beacon-app:${CIRCLE_BRANCH}-${CIRCLE_SHA1}/g" $MANIFESTS_PATH/app.daemonset.yaml
+            kubectl apply -f $MANIFESTS_PATH/app.daemonset.yaml
+            kubectl -n app rollout restart daemonset/app
 
 jobs:
   test-vrf:
@@ -226,30 +221,30 @@ jobs:
 workflows:
   build_test_deploy:
     jobs:
-      # - test-app
-      # - test-vrf
+      - test-app
+      - test-vrf
 
-      # ## Build Dev
-      # - build-vrf-dev:
-      #     filters:
-      #       branches:
-      #         only: development #change to dev branch
-      #     context:
-      #       - org-global
-      #     requires:
-      #       - test-app
-      #       - test-vrf
+      ## Build Dev
+      - build-vrf-dev:
+          filters:
+            branches:
+              only: development #change to dev branch
+          context:
+            - org-global
+          requires:
+            - test-app
+            - test-vrf
       
-      # - build-app-dev:
-      #     filters:
-      #       branches:
-      #         only: development #change to dev branch
-      #     context:
-      #       - org-global
-      #     requires:
-      #       - test-app
-      #       - test-vrf
-      # ## /Build Dev
+      - build-app-dev:
+          filters:
+            branches:
+              only: development #change to dev branch
+          context:
+            - org-global
+          requires:
+            - test-app
+            - test-vrf
+      ## /Build Dev
 
       ## Deploy dev
       - deploy-dev:
@@ -258,9 +253,9 @@ workflows:
               only: development #change to dev branch
           context:
             - org-global
-          # requires:
-          #   - test-app
-          #   - test-vrf
-            # - build-vrf-dev
-            # - build-app-dev
+          requires:
+            - test-app
+            - test-vrf
+            - build-vrf-dev
+            - build-app-dev
       ## /Deploy dev

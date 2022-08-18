@@ -188,4 +188,4 @@ workflows:
           requires:
             - test-app
             - test-vrf
-            - test-build
+            - build-app-dev

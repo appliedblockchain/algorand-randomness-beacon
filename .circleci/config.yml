@@ -2,11 +2,11 @@ version: 2.1
 
 #Use commands to avoid steps repetition
 commands:
-  build-app:
+  build-vrf:
     steps:
       - run:
           name: build images
-          command: docker-compose -f docker-compose.yml build
+          command: docker-compose -f docker-compose.yml build vrf
       - run:
           name: Login to Dockerhub
           command: docker login -u abbuilder -p "$DOCKER_PASSWORD"
@@ -14,11 +14,20 @@ commands:
           name: tag vrf image
           command: docker tag appliedblockchain/algorand-randomness-beacon-vrf:latest appliedblockchain/algorand-randomness-beacon-vrf:${CIRCLE_BRANCH}-${CIRCLE_SHA1}
       - run:
-          name: tag app image
-          command: docker tag appliedblockchain/algorand-randomness-beacon-app:latest appliedblockchain/algorand-randomness-beacon-app:${CIRCLE_BRANCH}-${CIRCLE_SHA1}
-      - run:
           name: Push vrf tagged image to Dockerhub
           command: docker push appliedblockchain/algorand-randomness-beacon-vrf:${CIRCLE_BRANCH}-${CIRCLE_SHA1}
+
+  build-app:
+    steps:
+      - run:
+          name: build images
+          command: docker-compose -f docker-compose.yml build app
+      - run:
+          name: Login to Dockerhub
+          command: docker login -u abbuilder -p "$DOCKER_PASSWORD"
+      - run:
+          name: tag app image
+          command: docker tag appliedblockchain/algorand-randomness-beacon-app:latest appliedblockchain/algorand-randomness-beacon-app:${CIRCLE_BRANCH}-${CIRCLE_SHA1}
       - run:
           name: Push app tagged image to Dockerhub
           command: docker push appliedblockchain/algorand-randomness-beacon-app:${CIRCLE_BRANCH}-${CIRCLE_SHA1}
@@ -152,6 +161,17 @@ jobs:
           version: 20.10.2
       - build-app
 
+  build-vrf-dev:
+    docker:
+      - image: cimg/node:lts
+    environment:
+          NODE_ENV: test
+    steps:
+      - setup_remote_docker:
+          docker_layer_caching: true
+          version: 20.10.2
+      - build-vrf
+
   deploy-dev:
     docker:
       - image: 'cimg/base:stable'
@@ -176,16 +196,36 @@ workflows:
     jobs:
       - test-app
       - test-vrf
-      - build-app-dev
 
-      #Deploy dev
-      - deploy-dev:
+      - build-vrf-dev:
           filters:
             branches:
-              only: main #change to dev branch
+              only: developer #change to dev branch
           context:
             - org-global
           requires:
             - test-app
             - test-vrf
+      
+      - build-app-dev:
+          filters:
+            branches:
+              only: developer #change to dev branch
+          context:
+            - org-global
+          requires:
+            - test-app
+            - test-vrf
+
+      #Deploy dev
+      - deploy-dev:
+          filters:
+            branches:
+              only: developer #change to dev branch
+          context:
+            - org-global
+          requires:
+            - test-app
+            - test-vrf
+            - build-vrf-dev
             - build-app-dev

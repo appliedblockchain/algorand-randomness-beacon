@@ -1,14 +1,9 @@
 version: 2.1
 
-#Use commands to avoid steps repetition
+#Use commands to avoid steps code duplication
 commands:
   build-vrf:
     steps:
-      - run:
-          name: check folder
-          command: |
-            ls -la
-            pwd
       - run:
           name: build images
           command: docker-compose -f docker-compose.yml build vrf
@@ -179,6 +174,22 @@ jobs:
       - checkout
       - build-vrf
 
+  clean-dockerhub:
+    docker:
+      - image: cimg/node:lts
+    steps:
+      - setup_remote_docker:
+          docker_layer_caching: true
+          version: 20.10.2
+      - checkout
+      - run:
+          name: build images
+          command: |
+              echo "export DOCKER_PASSWORD=${DOCKER_PASSWORD}" >> ${BASH_ENV}
+      - run:
+          name: Execute clean script
+          command: cd stack-eks && ./clean-dockerhub-images.sh
+
   deploy-dev:
     docker:
       - image: 'cimg/base:stable'
@@ -196,6 +207,7 @@ jobs:
               echo "export SERVICE_MNEMONIC=${DEV_SERVICE_MNEMONIC}" >> ${BASH_ENV}
               echo "export APP_AWS_SECRET_ACCESS_KEY=${DEV_APP_AWS_SECRET_ACCESS_KEY}" >> ${BASH_ENV}
               echo "export VRF_ENCRYPTED_KEY=${DEV_VRF_ENCRYPTED_KEY}" >> ${BASH_ENV}
+      - checkout
       - deploy-kubernetes
 
 workflows:
@@ -204,6 +216,7 @@ workflows:
       - test-app
       - test-vrf
 
+      ## Build Dev
       - build-vrf-dev:
           filters:
             branches:
@@ -223,8 +236,9 @@ workflows:
           requires:
             - test-app
             - test-vrf
+      ## /Build Dev
 
-      #Deploy dev
+      ## Deploy dev
       - deploy-dev:
           filters:
             branches:
@@ -236,3 +250,4 @@ workflows:
             - test-vrf
             - build-vrf-dev
             - build-app-dev
+      ## /Deploy dev

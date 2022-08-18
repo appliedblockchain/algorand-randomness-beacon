@@ -4,12 +4,13 @@ A VRF oracle on Algorand's blockchain.
 
 # Requirements
 
-- Node.js
+- Node.js >= 16.16.0
+- Docker
 
-# Services
+# Services description
 
-- App: Main service that runs in a loop to check when to generate the VRF value and create the transaction.
-- VRF Generator: Isolated component to generate the VRF random value
+- App: Main service that runs in a loop to check when to generate the VRF value and submit the value to the smart contract.
+- VRF Generator: Isolated component to generate the VRF random value.
 
 # Services setup
 
@@ -17,19 +18,24 @@ A VRF oracle on Algorand's blockchain.
 
 # Development
 
+You can develop using docker or locally.
+
+## Locally
+
+Run npm install on each service and then
 ```sh
 npm run start:dev
 ```
 
+## Docker
+
+```sh
+docker-compose -f docker-compose.dev.yml build
+docker-compose -f docker-compose.dev.yml up
+```
 
 # Build
 
 ```sh
-npm run build
-```
-
-# Run the app
-
-```sh
-npm start
+docker-compose build
 ```

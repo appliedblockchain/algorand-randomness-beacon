@@ -258,9 +258,9 @@ workflows:
               only: development #change to dev branch
           context:
             - org-global
-          requires:
-            # - test-app
-            # - test-vrf
+          # requires:
+          #   - test-app
+          #   - test-vrf
             # - build-vrf-dev
             # - build-app-dev
       ## /Deploy dev

@@ -6,7 +6,7 @@ USERNAME="abbuilder"
 PASS=$DOCKER_PASSWORD
 
 COMPANY="appliedblockchain"
-REPO_LIST=("uppfirst-web")
+REPO_LIST=("algorand-randomness-beacon-vrf" "algorand-randomness-beacon-app")
 QTY_IMAGES_TO_MAINTAIN=5
 
 #get dockerhub token

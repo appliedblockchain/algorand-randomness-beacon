@@ -43,7 +43,7 @@ const mainFlow = async () => {
     logger.debug({ nextExpectedRound, blockSeed, vrfInput, vrfProof })
 
     try {
-      logger.info('Submiting the proof', { vrfInput })
+      logger.info('Submitting the proof', { vrfInput })
       const submitResult = await submitValue(nextExpectedRound, Buffer.alloc(80, vrfProof, 'hex'), logger)
       const dataToLog = {
         lastRound,

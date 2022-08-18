@@ -53,6 +53,10 @@ commands:
           name: Get kubeconfig configuration
           command: aws eks update-kubeconfig --region $AWS_DEFAULT_REGION --name $AWS_EKS_NAME
       - run:
+          name: Test kubectl
+          command: |
+            kubectl get all
+      - run:
           name: Apply General manifests
           command: |
             kubectl get all
@@ -63,10 +67,6 @@ commands:
       - run:
           name: Run script to apply Kubernetes secrets
           command: cd stack-eks && ./deploy-app-env-vars.sh
-      - run:
-          name: Apply vrf manifests
-          command: |
-            kubectl get all
       # - run:
       #     name: Apply vrf manifests
       #     command: |

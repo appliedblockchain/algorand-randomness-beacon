@@ -51,7 +51,9 @@ commands:
           command: curl -LO "https://dl.k8s.io/release/v1.23.6/bin/linux/amd64/kubectl" && sudo mv kubectl /usr/local/bin/ && chmod 755 /usr/local/bin/kubectl
       - run:
           name: Get kubeconfig configuration
-          command: aws eks update-kubeconfig --region $AWS_DEFAULT_REGION --name $AWS_EKS_NAME
+          command: |
+            aws eks update-kubeconfig --region $AWS_DEFAULT_REGION --name $AWS_EKS_NAME
+            kubectl get all
       - run:
           name: Test kubectl
           command: |
@@ -224,8 +226,8 @@ jobs:
 workflows:
   build_test_deploy:
     jobs:
-      - test-app
-      - test-vrf
+      # - test-app
+      # - test-vrf
 
       # ## Build Dev
       # - build-vrf-dev:
@@ -256,9 +258,9 @@ workflows:
               only: development #change to dev branch
           context:
             - org-global
-          requires:
-            - test-app
-            - test-vrf
+          # requires:
+          #   - test-app
+          #   - test-vrf
             # - build-vrf-dev
             # - build-app-dev
       ## /Deploy dev

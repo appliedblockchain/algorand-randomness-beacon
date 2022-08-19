@@ -25,6 +25,7 @@ const mainFlow = async () => {
     }
     const nextExpectedRound = await getNextExpectedRound(lastRound)
     if (nextExpectedRound > lastRound) {
+      span.addTags({ lastRound, nextExpectedRound, result: 'IGNORED' })
       logger.info('Ignoring current round', { lastRound, nextExpectedRound })
       return
     }
@@ -44,8 +45,11 @@ const mainFlow = async () => {
 
     try {
       logger.info('Submitting the proof', { vrfInput })
-      const submitResult = await submitValue(nextExpectedRound, Buffer.alloc(80, vrfProof, 'hex'), logger)
+      const submitResult = await tracer.trace('submit', {}, () =>
+        submitValue(nextExpectedRound, Buffer.alloc(80, vrfProof, 'hex'), logger),
+      )
       const dataToLog = {
+        txID: submitResult.txIDs[0],
         lastRound,
         submittedRound: nextExpectedRound,
         confirmedRound: submitResult.confirmedRound,
@@ -53,6 +57,7 @@ const mainFlow = async () => {
         vrfInput,
         vrfProof,
       }
+      span.addTags({ ...dataToLog, result: 'SUBMITTED' })
       logger.debug('Proof submitted', dataToLog)
       const roundsAfter = submitResult.confirmedRound - nextExpectedRound
       if (roundsAfter > 3) {
@@ -62,6 +67,7 @@ const mainFlow = async () => {
         })
       }
     } catch (error) {
+      span.addTags({ result: 'ERROR' })
       if (error?.response) {
         logger.error('Error submitting the proof', { statusCode: error.response.statusCode, body: error.response.body })
       } else {
@@ -69,6 +75,7 @@ const mainFlow = async () => {
       }
     }
   } catch (error) {
+    span.setTag('result', 'ERROR')
     Sentry.captureException(error)
     logger.error(error)
   }

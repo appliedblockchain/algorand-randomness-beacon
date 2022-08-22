@@ -55,7 +55,7 @@ spec:
                 name: app-env-vars
                 key: SERVICE_MNEMONIC
           - name: SERVICE_ACCOUNT_MINIMUM_BALANCE
-            value: "50000000"
+            value: "10000000"
           - name: DD_ENV
             value: "development randomness-oracle-env-03-eks"
           - name: DD_VERSION
@@ -69,7 +69,7 @@ spec:
           - name: DD_LOGS_INJECTION
             value: "true"
           - name: MOST_DISTANT_ROUNDS_ALLOWED
-            value: 1016""
+            value: "992"
           - name: BLOCK_INTERVAL
             value: "8"
           - name: MAIN_LOOP_INTERVAL

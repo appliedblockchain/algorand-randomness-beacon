@@ -12,10 +12,10 @@ const server: VrfHandlers = {
   GenerateProof: async (call: grpc.ServerUnaryCall<VRFInput, VRFProof>, callback: grpc.sendUnaryData<VRFProof>) => {
     const traceId = call.metadata.get('trace-id')[0]
     const logger = parentLogger.child({ traceId })
-    const vrfInputString = Buffer.from(call.request.vrfInput).toString()
+    const vrfInputString = Buffer.from(call.request.vrfInput, 'hex')
     try {
-      logger.info('Generate proof handler', { vrfInputString })
-      const vrfInputBuffer = Buffer.from(call.request.vrfInput)
+      logger.info('Generate proof handler', { vrfInput: call.request.vrfInput })
+      const vrfInputBuffer = Buffer.from(call.request.vrfInput, 'hex')
 
       logger.info('Getting VRF key')
       const decryptedVrfKey = await decryptVrfKey()

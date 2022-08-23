@@ -122,10 +122,9 @@ export const getNextExpectedRound = async (lastRound: number): Promise<number | 
   // There was a disaster. We will return the last block - (1000 - 8) nearest mod 8
   const recoverUntilRound = lastRound - +MOST_DISTANT_ROUNDS_ALLOWED
 
-  // Closest valid round greater than the last round until when we can send the tx
+  // Closest valid round less than or equal the most distant round we can recover
   if (lastRoundAcceptedBySC < recoverUntilRound) {
-    const closestValidRound = recoverUntilRound + +BLOCK_INTERVAL - (recoverUntilRound % +BLOCK_INTERVAL)
-    return recoverUntilRound % +BLOCK_INTERVAL === 0 ? recoverUntilRound : closestValidRound
+    return recoverUntilRound - (recoverUntilRound % 8)
   }
 
   const nextExpectedRound = lastRoundAcceptedBySC + +BLOCK_INTERVAL

@@ -39,14 +39,14 @@ const mainFlow = async () => {
     logger.info('Building VRF input', { nextExpectedRound, blockSeed })
     const vrfInput = buildVrfInput(nextExpectedRound, blockSeed)
 
-    logger.info('Getting the proof hash', { vrfInput })
+    logger.info('Getting the proof', { vrfInput })
     const vrfProof = await getVrfProof(vrfInput, logger, traceId)
-    logger.debug({ nextExpectedRound, blockSeed, vrfInput, vrfProof })
+    logger.debug({ lastRound, nextExpectedRound, blockSeed, vrfInput, vrfProof })
 
     try {
       logger.info('Submitting the proof', { vrfInput })
       const submitResult = await tracer.trace('submit', {}, () =>
-        submitValue(nextExpectedRound, Buffer.alloc(80, vrfProof, 'hex'), logger),
+        submitValue(nextExpectedRound, Buffer.from(vrfProof, 'hex')),
       )
       const dataToLog = {
         txID: submitResult.txIDs[0],

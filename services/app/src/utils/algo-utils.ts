@@ -17,6 +17,7 @@ const {
 export const client = new algosdk.Algodv2(ALGOD_TOKEN, ALGOD_SERVER, ALGOD_PORT)
 
 const serviceAccount = algosdk.mnemonicToSecretKey(SERVICE_MNEMONIC)
+const signer = algosdk.makeBasicAccountTransactionSigner(serviceAccount)
 
 const contractPath = join(__dirname, '../contract.json')
 const contractBuff = fs.readFileSync(contractPath)
@@ -57,38 +58,38 @@ export const getGlobalStateValue = async (key: string): Promise<string | number 
   return getValueFromKeyValue(keyValue, false)
 }
 
-const executeAbiContract = async (
-  method: string,
-  methodArgs: algosdk.ABIArgument[],
-  logger: Logger,
+export const submitValue = async (
+  blockNumber: number,
+  vrfOutput: Buffer,
 ): Promise<{
   confirmedRound: number
   txIDs: string[]
   methodResults: algosdk.ABIResult[]
 }> => {
-  const appId = parseInt(process.env.APP_ID)
+  const appId = parseInt(process.env.APP_ID, 10)
+  const dummyAppId = parseInt(process.env.DUMMY_APP_ID, 10)
+  const numOfDummyTxns = parseInt(process.env.NUMBER_OF_DUMMY_TRANSACTIONS, 10)
 
   const sp = await client.getTransactionParams().do()
   const comp = new algosdk.AtomicTransactionComposer()
 
+  sp.firstRound = blockNumber + 1
+  sp.lastRound = sp.firstRound + 1000
   comp.addMethodCall({
-    method: contract.getMethodByName(method),
-    methodArgs,
+    method: contract.getMethodByName('submit'),
+    methodArgs: [blockNumber, vrfOutput],
     appID: appId,
     sender: serviceAccount.addr,
     suggestedParams: sp,
-    signer: algosdk.makeBasicAccountTransactionSigner(serviceAccount),
+    signer,
   })
 
-  const results = await comp.execute(client, 2)
-  for (const result of results.methodResults) {
-    logger.debug(`${result.method.name} => ${result.returnValue}`)
+  for (let i = 0; i < numOfDummyTxns; i++) {
+    const txn = algosdk.makeApplicationNoOpTxn(serviceAccount.addr, sp, dummyAppId, [], [], [], [], new Uint8Array([i]))
+    comp.addTransaction({ txn, signer: algosdk.makeBasicAccountTransactionSigner(serviceAccount) })
   }
-  return results
-}
 
-export const submitValue = async (blockNumber: number, vrfOutput: Buffer, logger: Logger) => {
-  return await executeAbiContract('submit', [blockNumber, vrfOutput], logger)
+  return comp.execute(client, 2)
 }
 
 /**

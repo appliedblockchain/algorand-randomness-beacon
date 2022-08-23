@@ -43,6 +43,10 @@ spec:
             value: "LWOXAHEF32ISGGQSQTOFFTVSVUGJIRRFSIJYRFVL4PK4KS7MNG4SBWKYK4"
           - name: APP_ID
             value: "1143833560"
+          - name: DUMMY_APP_ID
+            value: "1143833343"
+          - name: NUMBER_OF_DUMMY_TRANSACTIONS
+            value: "8"
           - name: STARTING_ROUND
             value: "19955232"
           - name: VRF_GRPC_HOST

@@ -1,5 +1,6 @@
-# node:16.16.0
-FROM node@sha256:8cb8d1582f235b30eea033baddde78b17143348fb392154d4c67a3c08307a8f2 as builder
+# node:16.16.0-alpine3.16
+FROM node@sha256:1c8769a8c9ed57817ef07162744a3722421333a438185c560aa42a9a1fc6ea23 as builder
+RUN apk add --no-cache python3 make g++
 WORKDIR /usr/src/app
 COPY . /usr/src/app
 RUN npm install &&\
@@ -8,9 +9,10 @@ RUN npm install &&\
   rm -rf node_modules &&\
   npm ci --only=production
 
-# node:16.16.0
-FROM node@sha256:8cb8d1582f235b30eea033baddde78b17143348fb392154d4c67a3c08307a8f2 as prod
-RUN apt-get update -y && apt-get install -y dumb-init
+# node:16.16.0-alpine3.16
+FROM node@sha256:1c8769a8c9ed57817ef07162744a3722421333a438185c560aa42a9a1fc6ea23 as prod
+
+RUN apk update && apk add dumb-init
 ENV NODE_ENV production
 WORKDIR /usr/src/app
 COPY --chown=node:node ./package*.json /usr/src/app/

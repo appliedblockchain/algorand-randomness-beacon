@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { generateVrfKeyPair, vrfProofToHash, vrfProve, vrfVerify } from '../../src/utils/libsodium-wrapper'
 
 describe('VRF', () => {

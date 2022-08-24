@@ -6,4 +6,10 @@ module.exports = {
   parserOptions: {
     project: './tsconfig.json',
   },
+  rules: {
+    'comma-dangle': ['error', 'always-multiline'],
+    'array-bracket-spacing': ['error', 'never'],
+    quotes: ['error', 'single', { avoidEscape: true }],
+    'no-mixed-operators': ['off'],
+  },
 }

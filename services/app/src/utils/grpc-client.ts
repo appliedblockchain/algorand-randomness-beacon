@@ -3,7 +3,7 @@ import * as protoLoader from '@grpc/proto-loader'
 import { ProtoGrpcType } from '../proto/vrf'
 import path from 'path'
 import { promisify } from 'util'
-import logger from '../logger'
+import parentLogger from '../logger'
 import { Logger } from 'winston'
 import { VRFInput } from '../proto/vrf/VRFInput'
 
@@ -19,9 +19,9 @@ const deadline = getDeadline()
 
 client.waitForReady(deadline, (error?: Error) => {
   if (error) {
-    logger.error(`Client connect error: ${error.message}`)
+    parentLogger.error(`Client connect error: ${error.message}`)
   } else {
-    logger.info('gRPC client ready')
+    parentLogger.info('gRPC client ready')
   }
 })
 

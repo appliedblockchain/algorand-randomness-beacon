@@ -1,7 +1,6 @@
 import algosdk from 'algosdk'
 import fs from 'fs'
 import { TealKeyValue } from 'algosdk/dist/types/src/client/v2/algod/models/types'
-import { Logger } from 'winston'
 import { join } from 'path'
 const {
   ALGOD_TOKEN,
@@ -86,7 +85,7 @@ export const submitValue = async (
 
   for (let i = 0; i < numOfDummyTxns; i++) {
     const txn = algosdk.makeApplicationNoOpTxn(serviceAccount.addr, sp, dummyAppId, [], [], [], [], new Uint8Array([i]))
-    comp.addTransaction({ txn, signer: algosdk.makeBasicAccountTransactionSigner(serviceAccount) })
+    comp.addTransaction({ txn, signer })
   }
 
   return comp.execute(client, 2)

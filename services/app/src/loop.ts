@@ -57,11 +57,12 @@ const mainFlow = async () => {
         vrfInput,
         vrfProof,
       }
-      span.addTags({ ...dataToLog, result: 'SUBMITTED' })
       logger.debug('Proof submitted', dataToLog)
       const roundsAfter = submitResult.confirmedRound - nextExpectedRound
+      span.addTags({ ...dataToLog, result: 'SUBMITTED', SLA: 'MET', submittedAfterNumRounds: roundsAfter })
       if (roundsAfter > 3) {
-        logger.warning('SLA not met', dataToLog)
+        span.setTag('SLA', 'NOT_MET')
+        logger.warn('SLA not met', dataToLog)
         Sentry.captureException(new Error('Proof submitted outside SLA'), {
           extra: { ...dataToLog, roundsAfter },
         })

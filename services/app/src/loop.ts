@@ -11,9 +11,8 @@ import parentLogger from './logger'
 import { getVrfProof } from './utils/grpc-client'
 import { randomUUID } from 'crypto'
 import tracer from './utils/tracer'
-
-const serviceAccountMinimumBalance = parseInt(process.env.SERVICE_ACCOUNT_MINIMUM_BALANCE, 10)
-
+import config from './config'
+const { serviceAccountMinimumBalance, mainLoopInterval } = config
 const mainFlow = async () => {
   const span = tracer.startSpan('main-flow')
   const traceId = randomUUID()
@@ -70,9 +69,14 @@ const mainFlow = async () => {
     } catch (error) {
       span.addTags({ result: 'ERROR' })
       if (error?.response) {
-        logger.error('Error submitting the proof', { statusCode: error.response.statusCode, body: error.response.body })
+        logger.error('Error submitting the proof', {
+          statusCode: error.response.statusCode,
+          body: error.response.body,
+          lastRound,
+          nextExpectedRound,
+        })
       } else {
-        logger.error('Error submitting the proof', error)
+        logger.error('Error submitting the proof', { lastRound, error, nextExpectedRound })
       }
     }
   } catch (error) {
@@ -93,8 +97,8 @@ export const serviceAccountBalanceAlert = async () => {
 }
 
 const loop = async () => {
-  setInterval(mainFlow, +process.env.MAIN_LOOP_INTERVAL)
-  setInterval(serviceAccountBalanceAlert, +process.env.MAIN_LOOP_INTERVAL)
+  setInterval(mainFlow, mainLoopInterval)
+  setInterval(serviceAccountBalanceAlert, mainLoopInterval)
 }
 
 export default loop

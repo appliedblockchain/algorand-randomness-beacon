@@ -2,20 +2,24 @@ import algosdk from 'algosdk'
 import fs from 'fs'
 import { TealKeyValue } from 'algosdk/dist/types/src/client/v2/algod/models/types'
 import { join } from 'path'
+import config from '../config'
 const {
-  ALGOD_TOKEN,
-  ALGOD_SERVER,
-  APP_CREATOR_ADDRESS,
-  ALGOD_PORT,
-  BLOCK_INTERVAL,
-  MOST_DISTANT_ROUNDS_ALLOWED,
-  SERVICE_MNEMONIC,
-  STARTING_ROUND,
-} = process.env
+  algodToken,
+  algodPort,
+  algodServer,
+  appCreatorAddress,
+  appId,
+  dummyAppId,
+  vrfRoundMultiple,
+  mostDistantRoundsAllowed,
+  serviceMnemonic,
+  vrfStartingRound,
+  numDummyTransactions,
+} = config
 
-export const client = new algosdk.Algodv2(ALGOD_TOKEN, ALGOD_SERVER, ALGOD_PORT)
+export const client = new algosdk.Algodv2(algodToken, algodServer, algodPort)
 
-const serviceAccount = algosdk.mnemonicToSecretKey(SERVICE_MNEMONIC)
+const serviceAccount = algosdk.mnemonicToSecretKey(serviceMnemonic)
 const signer = algosdk.makeBasicAccountTransactionSigner(serviceAccount)
 
 const contractPath = join(__dirname, '../contract.json')
@@ -33,9 +37,7 @@ export const getBlockSeed = async (round: number): Promise<string> => {
 }
 
 export const getGlobalState = async (): Promise<TealKeyValue[]> => {
-  const applicationInfoResponse = await client
-    .accountApplicationInformation(APP_CREATOR_ADDRESS as string, +process.env.APP_ID)
-    .do()
+  const applicationInfoResponse = await client.accountApplicationInformation(appCreatorAddress, appId).do()
   return applicationInfoResponse['created-app']['global-state']
 }
 
@@ -65,10 +67,6 @@ export const submitValue = async (
   txIDs: string[]
   methodResults: algosdk.ABIResult[]
 }> => {
-  const appId = parseInt(process.env.APP_ID, 10)
-  const dummyAppId = parseInt(process.env.DUMMY_APP_ID, 10)
-  const numOfDummyTxns = parseInt(process.env.NUMBER_OF_DUMMY_TRANSACTIONS, 10)
-
   const sp = await client.getTransactionParams().do()
   const comp = new algosdk.AtomicTransactionComposer()
 
@@ -83,7 +81,7 @@ export const submitValue = async (
     signer,
   })
 
-  for (let i = 0; i < numOfDummyTxns; i++) {
+  for (let i = 0; i < numDummyTransactions; i++) {
     const txn = algosdk.makeApplicationNoOpTxn(serviceAccount.addr, sp, dummyAppId, [], [], [], [], new Uint8Array([i]))
     comp.addTransaction({ txn, signer })
   }
@@ -103,30 +101,27 @@ export const getLastRoundAcceptedBySC = async (): Promise<number | null> => {
     throw new Error('Invalid last sent round')
   }
 
-  return +lastSentRound
+  return lastSentRound
 }
 
 export const getNextExpectedRound = async (lastRound: number): Promise<number | null> => {
   const lastRoundAcceptedBySC = await getLastRoundAcceptedBySC()
-  if (!lastRoundAcceptedBySC && +STARTING_ROUND <= lastRound) {
+  if (!lastRoundAcceptedBySC && vrfStartingRound <= lastRound) {
     // It's our first transaction
-    return +STARTING_ROUND
+    return vrfStartingRound
   }
 
-  if (+STARTING_ROUND > lastRound) {
+  if (vrfStartingRound > lastRound) {
     // We shouldn't start generating values yet
     return null
   }
 
-  // There was a disaster. We will return the last block - (1000 - 8) nearest mod 8
-  const recoverUntilRound = lastRound - +MOST_DISTANT_ROUNDS_ALLOWED
-
-  // Closest valid round less than or equal the most distant round we can recover
+  const recoverUntilRound = lastRound - mostDistantRoundsAllowed
   if (lastRoundAcceptedBySC < recoverUntilRound) {
     return recoverUntilRound - (recoverUntilRound % 8)
   }
 
-  const nextExpectedRound = lastRoundAcceptedBySC + +BLOCK_INTERVAL
+  const nextExpectedRound = lastRoundAcceptedBySC + vrfRoundMultiple
   return nextExpectedRound
 }
 

@@ -13,7 +13,7 @@ describe('algo-utils', () => {
       expect(await algoUtils.getNextExpectedRound(4000)).toBe(null)
     })
 
-    it('returns the STARTING_ROUND if the SC has no values and last round is at least the starting round', async () => {
+    it('returns the VRF_STARTING_ROUND if the SC has no values and last round is at least the starting round', async () => {
       getLastRoundAcceptedBySCMock.mockReturnValueOnce(Promise.resolve(null))
       expect(await algoUtils.getNextExpectedRound(5001)).toBe(5000)
     })
@@ -24,12 +24,12 @@ describe('algo-utils', () => {
     })
 
     describe('WHEN last accepted round is too far in the past (< LAST_ROUND - 1000 rounds)', () => {
-      it('returns the most distant accepted round if mod 8', async () => {
+      it('returns the most distant (984) accepted round if mod 8', async () => {
         getLastRoundAcceptedBySCMock.mockReturnValueOnce(Promise.resolve(5000))
         expect(await algoUtils.getNextExpectedRound(10000)).toBe(9016)
       })
 
-      it('returns the nearest mod 8 round less than the most distant accepted round', async () => {
+      it('returns the nearest mod 8 round >= the most distant accepted round', async () => {
         getLastRoundAcceptedBySCMock.mockReturnValue(Promise.resolve(5000))
         expect(await algoUtils.getNextExpectedRound(10001)).toBe(9016)
         expect(await algoUtils.getNextExpectedRound(10002)).toBe(9016)

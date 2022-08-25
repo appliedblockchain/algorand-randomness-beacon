@@ -6,6 +6,7 @@ import { promisify } from 'util'
 import parentLogger from '../logger'
 import { Logger } from 'winston'
 import { VRFInput } from '../proto/vrf/VRFInput'
+import config from '../config'
 
 const PROTO_PATH = path.join(__dirname, '../proto/vrf.proto')
 const packageDefinition = protoLoader.loadSync(PROTO_PATH)
@@ -14,7 +15,7 @@ const proto = grpc.loadPackageDefinition(packageDefinition) as unknown as ProtoG
 const getDeadline = () => {
   return new Date(Date.now() + 5000)
 }
-const client = new proto.vrf.Vrf(process.env.VRF_GRPC_HOST as string, grpc.credentials.createInsecure())
+const client = new proto.vrf.Vrf(config.vrfGrpcHost, grpc.credentials.createInsecure())
 const deadline = getDeadline()
 
 client.waitForReady(deadline, (error?: Error) => {

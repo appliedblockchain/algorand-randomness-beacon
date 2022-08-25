@@ -118,7 +118,8 @@ export const getNextExpectedRound = async (lastRound: number): Promise<number | 
 
   const recoverUntilRound = lastRound - mostDistantRoundsAllowed
   if (lastRoundAcceptedBySC < recoverUntilRound) {
-    return recoverUntilRound - (recoverUntilRound % 8)
+    // Disaster recovery
+    return recoverUntilRound + vrfRoundMultiple - (recoverUntilRound % vrfRoundMultiple)
   }
 
   const nextExpectedRound = lastRoundAcceptedBySC + vrfRoundMultiple

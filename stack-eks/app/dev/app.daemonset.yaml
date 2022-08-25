@@ -73,7 +73,7 @@ spec:
           - name: DD_LOGS_INJECTION
             value: "true"
           - name: MOST_DISTANT_ROUNDS_ALLOWED
-            value: "984"
+            value: "992"
           - name: VRF_ROUND_MULTIPLE
             value: "8"
           - name: MAIN_LOOP_INTERVAL

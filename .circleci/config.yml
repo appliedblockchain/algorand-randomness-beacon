@@ -143,46 +143,32 @@ jobs:
           path: services/app/reports/coverage
 
   test-build:
-    docker:
-      - image: cimg/node:lts
-        environment:
-          NODE_ENV: test
+    machine:
+      image: ubuntu-2004:2022.07.1
     steps:
       - checkout
-      - setup_remote_docker:
-          version: 20.10.2
       - run:
           name: Run docker build
           command: |-
             docker-compose -f docker-compose.yml build
 
   build-app-dev:
-    docker:
-      - image: cimg/node:lts
-        environment:
-          NODE_ENV: test
+    machine:
+      image: ubuntu-2004:2022.07.1
     steps:
-      - setup_remote_docker:
-          docker_layer_caching: true
-          version: 20.10.2
       - checkout
       - build-app
 
   build-vrf-dev:
-    docker:
-      - image: cimg/node:lts
-        environment:
-          NODE_ENV: test
+    machine:
+      image: ubuntu-2004:2022.07.1
     steps:
-      - setup_remote_docker:
-          docker_layer_caching: true
-          version: 20.10.2
       - checkout
       - build-vrf
 
   clean-dockerhub:
     docker:
-      - image: cimg/node:lts
+      - image: cimg/base:stable
     steps:
       - setup_remote_docker:
           docker_layer_caching: true
@@ -198,7 +184,7 @@ jobs:
 
   deploy-dev:
     docker:
-      - image: "cimg/base:stable"
+      - image: cimg/base:stable
         environment:
           MANIFESTS_PATH: "dev"
     steps:

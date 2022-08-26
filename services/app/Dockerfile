@@ -1,11 +1,11 @@
 # node:16.16.0-alpine3.16
-FROM node@sha256:1c8769a8c9ed57817ef07162744a3722421333a438185c560aa42a9a1fc6ea23 as builder
+FROM node@sha256:d39ab4712a8395d0b399dea44d9cb8b34ac942411b6a380449ebdb9d321136a3 as builder
 WORKDIR /usr/src/app
 COPY . /usr/src/app
 RUN npm install && npm run build:proto && npm run build
 
 # node:16.16.0-alpine3.16
-FROM node@sha256:1c8769a8c9ed57817ef07162744a3722421333a438185c560aa42a9a1fc6ea23 as prod
+FROM node@sha256:d39ab4712a8395d0b399dea44d9cb8b34ac942411b6a380449ebdb9d321136a3 as prod
 RUN apk add dumb-init
 ENV NODE_ENV production
 WORKDIR /usr/src/app

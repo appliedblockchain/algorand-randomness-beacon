@@ -1,7 +1,11 @@
+const algodTokens = process.env.ALGOD_TOKENS.split(',')
+const algodServers = process.env.ALGOD_SERVERS.split(',')
+const algodPorts = process.env.ALGOD_PORTS.split(',')
+
 const config = {
-  algodToken: process.env.ALGOD_TOKEN,
-  algodServer: process.env.ALGOD_SERVER,
-  algodPort: parseInt(process.env.ALGOD_PORT, 10),
+  algodTokens,
+  algodServers,
+  algodPorts,
   appCreatorAddress: process.env.APP_CREATOR_ADDRESS,
   appId: parseInt(process.env.APP_ID, 10),
   dummyAppId: parseInt(process.env.DUMMY_APP_ID, 10),

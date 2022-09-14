@@ -90,7 +90,7 @@ const mainFlow = async () => {
 export const serviceAccountBalanceAlert = async () => {
   const serviceAccountBalance = await getServiceAccountBalance()
   if (serviceAccountBalance < serviceAccountMinimumBalance) {
-    Sentry.captureException(new Error('Insuficient service account balance'), {
+    Sentry.captureException(new Error('Insufficient service account balance'), {
       extra: { serviceAccountBalance, serviceAccountMinimumBalance },
     })
   }

@@ -4,9 +4,9 @@ import { TealKeyValue } from 'algosdk/dist/types/src/client/v2/algod/models/type
 import { join } from 'path'
 import config from '../config'
 const {
-  algodToken,
-  algodPort,
-  algodServer,
+  algodPorts,
+  algodServers,
+  algodTokens,
   appCreatorAddress,
   appId,
   dummyAppId,
@@ -17,7 +17,9 @@ const {
   numDummyTransactions,
 } = config
 
-export const client = new algosdk.Algodv2(algodToken, algodServer, algodPort)
+export const algodClients = algodServers.map((algodServer, index) => {
+  return { algodClient: new algosdk.Algodv2(algodTokens[index], algodServer, algodPorts[index]), algodServer }
+})
 
 const serviceAccount = algosdk.mnemonicToSecretKey(serviceMnemonic)
 const signer = algosdk.makeBasicAccountTransactionSigner(serviceAccount)
@@ -26,17 +28,17 @@ const contractPath = join(__dirname, '../contract.json')
 const contractBuff = fs.readFileSync(contractPath)
 export const contract = new algosdk.ABIContract(JSON.parse(contractBuff.toString()))
 
-export const getLastRound = async (): Promise<number> => {
+export const getLastRound = async (client: algosdk.Algodv2): Promise<number> => {
   const status = await client.status().do()
   return status['last-round']
 }
 
-export const getBlockSeed = async (round: number): Promise<string> => {
+export const getBlockSeed = async (client: algosdk.Algodv2, round: number): Promise<string> => {
   const block = await client.block(round).do()
   return block?.block?.seed?.toString('hex')
 }
 
-export const getGlobalState = async (): Promise<TealKeyValue[]> => {
+export const getGlobalState = async (client: algosdk.Algodv2): Promise<TealKeyValue[]> => {
   const applicationInfoResponse = await client.accountApplicationInformation(appCreatorAddress, appId).do()
   return applicationInfoResponse['created-app']['global-state']
 }
@@ -48,8 +50,11 @@ export const getValueFromKeyValue = (kv: TealKeyValue, decode = true) => {
   }[Number(kv.value.type)]
 }
 
-export const getGlobalStateValue = async (key: string): Promise<string | number | bigint | Buffer | undefined> => {
-  const globalState = await getGlobalState()
+export const getGlobalStateValue = async (
+  client: algosdk.Algodv2,
+  key: string,
+): Promise<string | number | bigint | Buffer | undefined> => {
+  const globalState = await getGlobalState(client)
   const base64Key = Buffer.from(key).toString('base64')
   const keyValue: TealKeyValue | undefined = globalState.find((kv) => kv.key === base64Key)
   if (!keyValue) {
@@ -60,6 +65,7 @@ export const getGlobalStateValue = async (key: string): Promise<string | number 
 }
 
 export const submitValue = async (
+  client: algosdk.Algodv2,
   blockNumber: number,
   vrfOutput: Buffer,
 ): Promise<{
@@ -93,8 +99,8 @@ export const submitValue = async (
  *
  * @returns The last round accepted by the smart contract
  */
-export const getLastRoundAcceptedBySC = async (): Promise<number | null> => {
-  const lastSentRoundBuffer = (await getGlobalStateValue('')) as Buffer
+export const getLastRoundAcceptedBySC = async (client: algosdk.Algodv2): Promise<number | null> => {
+  const lastSentRoundBuffer = (await getGlobalStateValue(client, '')) as Buffer
   const lastSentRoundHex = lastSentRoundBuffer.toString('hex', 0, 8)
   const lastSentRound = parseInt(lastSentRoundHex, 16)
   if (isNaN(lastSentRound)) {
@@ -104,8 +110,8 @@ export const getLastRoundAcceptedBySC = async (): Promise<number | null> => {
   return lastSentRound
 }
 
-export const getNextExpectedRound = async (lastRound: number): Promise<number | null> => {
-  const lastRoundAcceptedBySC = await getLastRoundAcceptedBySC()
+export const getNextExpectedRound = async (client: algosdk.Algodv2, lastRound: number): Promise<number | null> => {
+  const lastRoundAcceptedBySC = await getLastRoundAcceptedBySC(client)
   if (!lastRoundAcceptedBySC && vrfStartingRound <= lastRound) {
     // It's our first transaction
     return vrfStartingRound
@@ -126,7 +132,7 @@ export const getNextExpectedRound = async (lastRound: number): Promise<number | 
   return nextExpectedRound
 }
 
-export const getServiceAccountBalance = async (): Promise<number> => {
+export const getServiceAccountBalance = async (client: algosdk.Algodv2): Promise<number> => {
   const result = await client.accountInformation(serviceAccount.addr).do()
 
   return result.amount

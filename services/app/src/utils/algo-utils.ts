@@ -121,9 +121,3 @@ export const getNextExpectedRound = async (client: algosdk.Algodv2, lastRound: n
   const nextExpectedRound = lastRoundAcceptedBySC + vrfRoundMultiple
   return nextExpectedRound
 }
-
-export const getServiceAccountBalance = async (client: algosdk.Algodv2): Promise<number> => {
-  const result = await client.accountInformation(serviceAccount.addr).do()
-
-  return result.amount
-}

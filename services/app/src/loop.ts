@@ -1,12 +1,5 @@
 import * as Sentry from '@sentry/node'
-import {
-  algodClients,
-  getBlockSeed,
-  getLastRound,
-  getNextExpectedRound,
-  getServiceAccountBalance,
-  submitValue,
-} from './utils/algo-utils'
+import { algodClients, getBlockSeed, getLastRound, getNextExpectedRound, submitValue } from './utils/algo-utils'
 import buildVrfInput from './utils/vrf'
 import parentLogger from './logger'
 import { getVrfProof } from './utils/grpc-client'

@@ -9,11 +9,6 @@ getLastRoundMock.mockReturnValue(Promise.resolve(null))
 
 describe('algo-utils', () => {
   describe('getNextExpectedRound', () => {
-    it('returns null if lastRound is less than the starting round', async () => {
-      getLastRoundAcceptedBySCMock.mockReturnValueOnce(Promise.resolve(null))
-      expect(await algoUtils.getNextExpectedRound(algodClient, 4000)).toBe(null)
-    })
-
     it('returns the next expected round (last sent + 8)', async () => {
       getLastRoundAcceptedBySCMock.mockReturnValueOnce(Promise.resolve(5000))
       expect(await algoUtils.getNextExpectedRound(algodClient, 5001)).toBe(5008)

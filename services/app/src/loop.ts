@@ -54,7 +54,7 @@ const mainFlow = async (client: Algodv2, algodServer: string) => {
       }
       logger.debug('Proof submitted', dataToLog)
       const roundsAfter = submitResult.confirmedRound - nextExpectedRound
-      span.addTags({ ...dataToLog, result: 'SUBMITTED', SLA: 'MET', submittedAfterNumRounds: roundsAfter })
+      span.addTags({ ...dataToLog, algodServer, result: 'SUBMITTED', SLA: 'MET', submittedAfterNumRounds: roundsAfter })
       if (roundsAfter > 3) {
         span.setTag('SLA', 'NOT_MET')
         logger.warn('SLA not met', dataToLog)

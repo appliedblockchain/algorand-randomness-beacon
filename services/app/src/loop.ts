@@ -1,5 +1,6 @@
 import * as Sentry from '@sentry/node'
 import {
+  algodClients,
   getBlockSeed,
   getLastRound,
   getNextExpectedRound,
@@ -12,17 +13,19 @@ import { getVrfProof } from './utils/grpc-client'
 import { randomUUID } from 'crypto'
 import tracer from './utils/tracer'
 import config from './config'
-const { serviceAccountMinimumBalance, mainLoopInterval } = config
-const mainFlow = async () => {
+import { Algodv2 } from 'algosdk'
+const { serviceAccountMinimumBalance, mainLoopInterval, algodPorts, algodServers, algodTokens } = config
+
+const mainFlow = async (client: Algodv2, algodServer: string) => {
   const span = tracer.startSpan('main-flow')
   const traceId = randomUUID()
-  const logger = parentLogger.child({ traceId })
+  const logger = parentLogger.child({ traceId, algodServer })
   try {
-    const lastRound = await getLastRound()
+    const lastRound = await getLastRound(client)
     if (!lastRound) {
       throw new Error("can't get last round")
     }
-    const nextExpectedRound = await getNextExpectedRound(lastRound)
+    const nextExpectedRound = await getNextExpectedRound(client, lastRound)
     if (nextExpectedRound > lastRound) {
       span.addTags({ lastRound, nextExpectedRound, result: 'IGNORED' })
       logger.info('Ignoring current round', { lastRound, nextExpectedRound })
@@ -30,7 +33,7 @@ const mainFlow = async () => {
     }
 
     logger.info(`Getting block seed for ${nextExpectedRound}`)
-    const blockSeed = await getBlockSeed(nextExpectedRound)
+    const blockSeed = await getBlockSeed(client, nextExpectedRound)
     if (!blockSeed) {
       throw new Error("can't get block seed")
     }
@@ -45,7 +48,7 @@ const mainFlow = async () => {
     try {
       logger.info('Submitting the proof', { vrfInput })
       const submitResult = await tracer.trace('submit', {}, () =>
-        submitValue(nextExpectedRound, Buffer.from(vrfProof, 'hex')),
+        submitValue(client, nextExpectedRound, Buffer.from(vrfProof, 'hex')),
       )
       const dataToLog = {
         txID: submitResult.txIDs[0],
@@ -87,8 +90,8 @@ const mainFlow = async () => {
   span.finish()
 }
 
-export const serviceAccountBalanceAlert = async () => {
-  const serviceAccountBalance = await getServiceAccountBalance()
+export const serviceAccountBalanceAlert = async (client: Algodv2) => {
+  const serviceAccountBalance = await getServiceAccountBalance(client)
   if (serviceAccountBalance < serviceAccountMinimumBalance) {
     Sentry.captureException(new Error('Insuficient service account balance'), {
       extra: { serviceAccountBalance, serviceAccountMinimumBalance },
@@ -97,8 +100,10 @@ export const serviceAccountBalanceAlert = async () => {
 }
 
 const loop = async () => {
-  setInterval(mainFlow, mainLoopInterval)
-  setInterval(serviceAccountBalanceAlert, mainLoopInterval)
+  for (const { algodClient, algodServer } of algodClients) {
+    setInterval(() => mainFlow(algodClient, algodServer), mainLoopInterval)
+    setInterval(() => serviceAccountBalanceAlert(algodClient), mainLoopInterval)
+  }
 }
 
 export default loop

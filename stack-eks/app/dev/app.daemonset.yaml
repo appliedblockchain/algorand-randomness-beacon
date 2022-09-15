@@ -35,10 +35,19 @@ spec:
               secretKeyRef:
                 name: app-env-vars
                 key: ALGOD_TOKEN
+          - name: ALGOD_TOKENS
+            valueFrom:
+              secretKeyRef:
+                name: app-env-vars
+                key: ALGOD_TOKENS
           - name: ALGOD_SERVER
             value: "https://betanet-algod.appliedblockchain.com"
+          - name: ALGOD_SERVERS
+            value: https://betanet-algod.appliedblockchain.com,https://node.betanet.algoexplorerapi.io
           - name: ALGOD_PORT
             value: "8080"
+          - name: ALGOD_PORTS
+            value: "8080,"
           - name: APP_CREATOR_ADDRESS
             value: "LWOXAHEF32ISGGQSQTOFFTVSVUGJIRRFSIJYRFVL4PK4KS7MNG4SBWKYK4"
           - name: APP_ID

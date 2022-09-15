@@ -14,7 +14,7 @@ import { randomUUID } from 'crypto'
 import tracer from './utils/tracer'
 import config from './config'
 import { Algodv2 } from 'algosdk'
-const { serviceAccountMinimumBalance, mainLoopInterval, algodPorts, algodServers, algodTokens } = config
+const { serviceAccountMinimumBalance, mainLoopInterval } = config
 
 const mainFlow = async (client: Algodv2, algodServer: string) => {
   const span = tracer.startSpan('main-flow')

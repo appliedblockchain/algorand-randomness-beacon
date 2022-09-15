@@ -13,7 +13,6 @@ const {
   vrfRoundMultiple,
   mostDistantRoundsAllowed,
   serviceMnemonic,
-  vrfStartingRound,
   numDummyTransactions,
 } = config
 
@@ -112,15 +111,6 @@ export const getLastRoundAcceptedBySC = async (client: algosdk.Algodv2): Promise
 
 export const getNextExpectedRound = async (client: algosdk.Algodv2, lastRound: number): Promise<number | null> => {
   const lastRoundAcceptedBySC = await getLastRoundAcceptedBySC(client)
-  if (!lastRoundAcceptedBySC && vrfStartingRound <= lastRound) {
-    // It's our first transaction
-    return vrfStartingRound
-  }
-
-  if (vrfStartingRound > lastRound) {
-    // We shouldn't start generating values yet
-    return null
-  }
 
   const recoverUntilRound = lastRound - mostDistantRoundsAllowed
   if (lastRoundAcceptedBySC < recoverUntilRound) {

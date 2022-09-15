@@ -9,7 +9,6 @@ const config = {
   appCreatorAddress: process.env.APP_CREATOR_ADDRESS,
   appId: parseInt(process.env.APP_ID, 10),
   dummyAppId: parseInt(process.env.DUMMY_APP_ID, 10),
-  vrfStartingRound: parseInt(process.env.VRF_STARTING_ROUND, 10),
   vrfGrpcHost: process.env.VRF_GRPC_HOST,
   serviceMnemonic: process.env.SERVICE_MNEMONIC,
   serviceAccountMinimumBalance: parseInt(process.env.SERVICE_ACCOUNT_MINIMUM_BALANCE, 10),

@@ -14,11 +14,6 @@ describe('algo-utils', () => {
       expect(await algoUtils.getNextExpectedRound(algodClient, 4000)).toBe(null)
     })
 
-    it('returns the VRF_STARTING_ROUND if the SC has no values and last round is at least the starting round', async () => {
-      getLastRoundAcceptedBySCMock.mockReturnValueOnce(Promise.resolve(null))
-      expect(await algoUtils.getNextExpectedRound(algodClient, 5001)).toBe(5000)
-    })
-
     it('returns the next expected round (last sent + 8)', async () => {
       getLastRoundAcceptedBySCMock.mockReturnValueOnce(Promise.resolve(5000))
       expect(await algoUtils.getNextExpectedRound(algodClient, 5001)).toBe(5008)

@@ -14,7 +14,7 @@ import { randomUUID } from 'crypto'
 import tracer from './utils/tracer'
 import config from './config'
 import { Algodv2 } from 'algosdk'
-const { serviceAccountMinimumBalance, mainLoopInterval } = config
+const { mainLoopInterval } = config
 
 const mainFlow = async (client: Algodv2, algodServer: string) => {
   const span = tracer.startSpan('main-flow')
@@ -90,19 +90,9 @@ const mainFlow = async (client: Algodv2, algodServer: string) => {
   span.finish()
 }
 
-export const serviceAccountBalanceAlert = async (client: Algodv2) => {
-  const serviceAccountBalance = await getServiceAccountBalance(client)
-  if (serviceAccountBalance < serviceAccountMinimumBalance) {
-    Sentry.captureException(new Error('Insuficient service account balance'), {
-      extra: { serviceAccountBalance, serviceAccountMinimumBalance },
-    })
-  }
-}
-
 const loop = async () => {
   for (const { algodClient, algodServer } of algodClients) {
     setInterval(() => mainFlow(algodClient, algodServer), mainLoopInterval)
-    setInterval(() => serviceAccountBalanceAlert(algodClient), mainLoopInterval)
   }
 }
 

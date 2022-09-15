@@ -56,8 +56,6 @@ spec:
               secretKeyRef:
                 name: app-env-vars
                 key: SERVICE_MNEMONIC
-          - name: SERVICE_ACCOUNT_MINIMUM_BALANCE
-            value: "10000000"
           - name: DD_ENV
             value: "development randomness-oracle-env-03-eks"
           - name: DD_VERSION

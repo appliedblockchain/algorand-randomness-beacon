@@ -159,7 +159,21 @@ jobs:
       - checkout
       - build-app
 
+  build-app-staging:
+    machine:
+      image: ubuntu-2004:2022.07.1
+    steps:
+      - checkout
+      - build-app
+
   build-vrf-dev:
+    machine:
+      image: ubuntu-2004:2022.07.1
+    steps:
+      - checkout
+      - build-vrf
+
+  build-vrf-staging:
     machine:
       image: ubuntu-2004:2022.07.1
     steps:
@@ -202,6 +216,26 @@ jobs:
       - checkout
       - deploy-kubernetes
 
+  deploy-staging:
+    docker:
+      - image: cimg/base:stable
+        environment:
+          MANIFESTS_PATH: "staging"
+    steps:
+      - run:
+          name: Set Pipeline Env Vars
+          command: |
+            echo "export AWS_ACCESS_KEY_ID=${STAGING_AWS_ACCESS_KEY_ID}" >> ${BASH_ENV}
+            echo "export AWS_SECRET_ACCESS_KEY=${STAGING_AWS_SECRET_ACCESS_KEY}" >> ${BASH_ENV}
+            echo "export AWS_DEFAULT_REGION=${STAGING_AWS_REGION}" >> ${BASH_ENV}
+            echo "export AWS_EKS_NAME=${STAGING_AWS_EKS_NAME}" >> ${BASH_ENV}
+            echo "export ALGOD_TOKENS=${STAGING_ALGOD_TOKENS}" >> ${BASH_ENV}
+            echo "export SERVICE_MNEMONIC=${STAGING_SERVICE_MNEMONIC}" >> ${BASH_ENV}
+            echo "export APP_AWS_SECRET_ACCESS_KEY=${STAGING_APP_AWS_SECRET_ACCESS_KEY}" >> ${BASH_ENV}
+            echo "export VRF_ENCRYPTED_KEY=${STAGING_VRF_ENCRYPTED_KEY}" >> ${BASH_ENV}
+      - checkout
+      - deploy-kubernetes
+
 workflows:
   version: 2
   build_test_deploy:
@@ -237,6 +271,28 @@ workflows:
             - test-vrf
       ## /Build Dev
 
+      ## Build Staging
+      - build-vrf-dev:
+          filters:
+            branches:
+              only: staging #change to staging branch
+          context:
+            - org-global
+          requires:
+            - test-app
+            - test-vrf
+
+      - build-app-dev:
+          filters:
+            branches:
+              only: staging #change to staging branch
+          context:
+            - org-global
+          requires:
+            - test-app
+            - test-vrf
+      ## /Build Staging
+
       - clean-dockerhub:
           filters:
             branches:
@@ -261,3 +317,15 @@ workflows:
             - build-vrf-dev
             - build-app-dev
       ## /Deploy dev
+
+      ## Deploy Staging
+      - deploy-dev:
+          filters:
+            branches:
+              only: staging #change to staging branch
+          context:
+            - org-global
+          requires:
+            - build-vrf-dev
+            - build-app-dev
+      ## /Deploy Staging

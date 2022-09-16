@@ -270,7 +270,7 @@ workflows:
             - test-app
             - test-vrf
 
-      - clean-dockerhub-dev:
+      - clean-dockerhub:
           filters:
             branches:
               only:
@@ -305,7 +305,7 @@ workflows:
             - test-app
             - test-vrf
 
-      - clean-dockerhub-staging:
+      - clean-dockerhub:
           filters:
             branches:
               only:

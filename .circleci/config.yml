@@ -269,31 +269,8 @@ workflows:
           requires:
             - test-app
             - test-vrf
-      ## /Build Dev
 
-      ## Build Staging
-      - build-vrf-dev:
-          filters:
-            branches:
-              only: staging #change to staging branch
-          context:
-            - org-global
-          requires:
-            - test-app
-            - test-vrf
-
-      - build-app-dev:
-          filters:
-            branches:
-              only: staging #change to staging branch
-          context:
-            - org-global
-          requires:
-            - test-app
-            - test-vrf
-      ## /Build Staging
-
-      - clean-dockerhub:
+      - clean-dockerhub-dev:
           filters:
             branches:
               only:
@@ -305,6 +282,44 @@ workflows:
           requires:
             - build-vrf-dev
             - build-app-dev
+      ## /Build Dev
+
+      ## Build Staging
+      - build-vrf-staging:
+          filters:
+            branches:
+              only: staging #change to staging branch
+          context:
+            - org-global
+          requires:
+            - test-app
+            - test-vrf
+
+      - build-app-staging:
+          filters:
+            branches:
+              only: staging #change to staging branch
+          context:
+            - org-global
+          requires:
+            - test-app
+            - test-vrf
+
+      - clean-dockerhub-staging:
+          filters:
+            branches:
+              only:
+                - development #change to dev branch
+                - staging #change to staging branch
+                - main #change to prod branch
+          context:
+            - org-global
+          requires:
+            - build-vrf-staging
+            - build-app-staging
+      ## /Build Staging
+
+      
 
       ## Deploy dev
       - deploy-dev:
@@ -319,13 +334,13 @@ workflows:
       ## /Deploy dev
 
       ## Deploy Staging
-      - deploy-dev:
+      - deploy-staging:
           filters:
             branches:
               only: staging #change to staging branch
           context:
             - org-global
           requires:
-            - build-vrf-dev
-            - build-app-dev
+            - build-vrf-staging
+            - build-app-staging
       ## /Deploy Staging

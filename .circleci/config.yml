@@ -459,4 +459,5 @@ workflows:
             - org-global
           requires:
             - approve-deploy-prod
+            - deploy-prod-a
       # /Deploy prod

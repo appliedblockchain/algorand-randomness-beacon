@@ -27,7 +27,7 @@ spec:
           - name: SERVICE
             value: "app"
           - name: NODE_ENV
-            value: "development"
+            value: "prod-b"
           - name: LOG_LEVEL
             value: "debug"
           - name: ALGOD_TOKENS
@@ -36,17 +36,19 @@ spec:
                 name: app-env-vars
                 key: ALGOD_TOKENS
           - name: ALGOD_SERVERS
-            value: https://betanet-algod.appliedblockchain.com,https://node.betanet.algoexplorerapi.io
+            value: https://testnet-algod.appliedblockchain.com,https://node.testnet.algoexplorerapi.io
           - name: ALGOD_PORTS
-            value: "8080,"
+            value: ","
           - name: APP_CREATOR_ADDRESS
             value: "LWOXAHEF32ISGGQSQTOFFTVSVUGJIRRFSIJYRFVL4PK4KS7MNG4SBWKYK4"
           - name: APP_ID
-            value: "1143833560"
+            value: "110096026"
           - name: DUMMY_APP_ID
-            value: "1143833343"
+            value: "110096020"
           - name: NUMBER_OF_DUMMY_TRANSACTIONS
             value: "8"
+          - name: VRF_STARTING_ROUND
+            value: "19955232"
           - name: VRF_GRPC_HOST
             value: "dns:vrf.app.svc:50051"
           - name: "SENTRY_DSN"
@@ -56,8 +58,10 @@ spec:
               secretKeyRef:
                 name: app-env-vars
                 key: SERVICE_MNEMONIC
+          - name: SERVICE_ACCOUNT_MINIMUM_BALANCE
+            value: "10000000"
           - name: DD_ENV
-            value: "development randomness-oracle-env-03-eks"
+            value: "prod-b randomness-oracle-env-02-a-eks"
           - name: DD_VERSION
             value: "0.0.1"
           - name: DD_AGENT_HOST
@@ -73,7 +77,7 @@ spec:
           - name: VRF_ROUND_MULTIPLE
             value: "8"
           - name: MAIN_LOOP_INTERVAL
-            value: "500"
+            value: "3000"
           resources:
             requests:
               cpu: 200m
@@ -84,4 +88,4 @@ spec:
       imagePullSecrets:
         - name: regcred
       nodeSelector:
-        eks.amazonaws.com/nodegroup: randomness-oracle-env-03-nodes-app
+        eks.amazonaws.com/nodegroup: randomness-oracle-env-02-b-nodes-app

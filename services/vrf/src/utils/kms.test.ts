@@ -13,7 +13,7 @@ describe('KMS', () => {
       await client.enableKey({ KeyId: kmsKeyId })
       const { CiphertextBlob } = await client.encrypt({
         KeyId: kmsKeyId,
-        Plaintext: Buffer.from(VRF_KEY),
+        Plaintext: Buffer.from(VRF_KEY, 'hex'),
       })
       jest.resetModules()
       process.env = {

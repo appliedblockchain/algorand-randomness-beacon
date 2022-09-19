@@ -17,7 +17,6 @@ describe('libsodium-wrapper', () => {
     })
 
     it('throws error when failing decoding the key', () => {
-      const { sk } = generateVrfKeyPair()
       const message = Buffer.from('random value')
       expect(() => vrfProve(Buffer.from('invalid-key'), message)).toThrow()
     })

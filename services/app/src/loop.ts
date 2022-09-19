@@ -1,28 +1,32 @@
 import * as Sentry from '@sentry/node'
-import { getBlockSeed, getLastRound, getNextExpectedRound, submitValue } from './utils/algo-utils'
+import { algodClients, getBlockSeed, getLastRound, getNextExpectedRound, submitValue } from './utils/algo-utils'
 import buildVrfInput from './utils/vrf'
 import parentLogger from './logger'
 import { getVrfProof } from './utils/grpc-client'
 import { randomUUID } from 'crypto'
 import tracer from './utils/tracer'
+import config from './config'
+import { Algodv2 } from 'algosdk'
+const { mainLoopInterval } = config
 
-const mainFlow = async () => {
+const mainFlow = async (client: Algodv2, algodServer: string) => {
   const span = tracer.startSpan('main-flow')
   const traceId = randomUUID()
-  const logger = parentLogger.child({ traceId })
+  const logger = parentLogger.child({ traceId, algodServer })
   try {
-    const lastRound = await getLastRound()
+    const lastRound = await getLastRound(client)
     if (!lastRound) {
       throw new Error("can't get last round")
     }
-    const nextExpectedRound = await getNextExpectedRound(lastRound)
+    const nextExpectedRound = await getNextExpectedRound(client, lastRound)
     if (nextExpectedRound > lastRound) {
+      span.addTags({ lastRound, nextExpectedRound, result: 'IGNORED' })
       logger.info('Ignoring current round', { lastRound, nextExpectedRound })
       return
     }
 
     logger.info(`Getting block seed for ${nextExpectedRound}`)
-    const blockSeed = await getBlockSeed(nextExpectedRound)
+    const blockSeed = await getBlockSeed(client, nextExpectedRound)
     if (!blockSeed) {
       throw new Error("can't get block seed")
     }
@@ -30,26 +34,49 @@ const mainFlow = async () => {
     logger.info('Building VRF input', { nextExpectedRound, blockSeed })
     const vrfInput = buildVrfInput(nextExpectedRound, blockSeed)
 
-    logger.info('Getting the proof hash', { vrfInput })
+    logger.info('Getting the proof', { vrfInput })
     const vrfProof = await getVrfProof(vrfInput, logger, traceId)
-    logger.debug({ nextExpectedRound, blockSeed, vrfInput, vrfProof })
+    logger.debug({ lastRound, nextExpectedRound, blockSeed, vrfInput, vrfProof })
 
     try {
-      logger.info('Submiting the value', { vrfInput })
-      const submitResult = await submitValue(nextExpectedRound, vrfProof, logger)
-      logger.debug('Random value submitted', {
+      logger.info('Submitting the proof', { vrfInput })
+      const submitResult = await tracer.trace('submit', {}, () =>
+        submitValue(client, nextExpectedRound, Buffer.from(vrfProof, 'hex')),
+      )
+      const dataToLog = {
+        txID: submitResult.txIDs[0],
         lastRound,
-        nextExpectedRound,
+        submittedRound: nextExpectedRound,
         confirmedRound: submitResult.confirmedRound,
         blockSeed,
         vrfInput,
         vrfProof,
-      })
+      }
+      logger.debug('Proof submitted', dataToLog)
+      const roundsAfter = submitResult.confirmedRound - nextExpectedRound
+      span.addTags({ ...dataToLog, algodServer, result: 'SUBMITTED', SLA: 'MET', submittedAfterNumRounds: roundsAfter })
+      if (roundsAfter > 3) {
+        span.setTag('SLA', 'NOT_MET')
+        logger.warn('SLA not met', dataToLog)
+        Sentry.captureException(new Error('Proof submitted outside SLA'), {
+          extra: { ...dataToLog, roundsAfter },
+        })
+      }
     } catch (error) {
-      // TODO: Handle error
-      logger.error(error)
+      span.addTags({ result: 'ERROR' })
+      if (error?.response) {
+        logger.error('Error submitting the proof', {
+          statusCode: error.response.statusCode,
+          body: error.response.body,
+          lastRound,
+          nextExpectedRound,
+        })
+      } else {
+        logger.error('Error submitting the proof', { lastRound, error, nextExpectedRound })
+      }
     }
   } catch (error) {
+    span.setTag('result', 'ERROR')
     Sentry.captureException(error)
     logger.error(error)
   }
@@ -57,7 +84,9 @@ const mainFlow = async () => {
 }
 
 const loop = async () => {
-  setInterval(mainFlow, +process.env.MAIN_LOOP_INTERVAL)
+  for (const { algodClient, algodServer } of algodClients) {
+    setInterval(() => mainFlow(algodClient, algodServer), mainLoopInterval)
+  }
 }
 
 export default loop

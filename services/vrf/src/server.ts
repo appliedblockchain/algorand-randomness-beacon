@@ -1,6 +1,5 @@
 import * as grpc from '@grpc/grpc-js'
 import * as Sentry from '@sentry/node'
-import { randomUUID } from 'crypto'
 import parentLogger from './logger'
 import { VrfHandlers } from './proto/vrf/Vrf'
 import { VRFInput } from './proto/vrf/VRFInput'
@@ -12,10 +11,9 @@ const server: VrfHandlers = {
   GenerateProof: async (call: grpc.ServerUnaryCall<VRFInput, VRFProof>, callback: grpc.sendUnaryData<VRFProof>) => {
     const traceId = call.metadata.get('trace-id')[0]
     const logger = parentLogger.child({ traceId })
-    const vrfInputString = Buffer.from(call.request.vrfInput).toString()
     try {
-      logger.info('Generate proof handler', { vrfInputString })
-      const vrfInputBuffer = Buffer.from(call.request.vrfInput)
+      logger.info('Generate proof handler', { vrfInput: call.request.vrfInput })
+      const vrfInputBuffer = Buffer.from(call.request.vrfInput, 'hex')
 
       logger.info('Getting VRF key')
       const decryptedVrfKey = await decryptVrfKey()
@@ -27,7 +25,7 @@ const server: VrfHandlers = {
       callback(null, { vrfProof: proof.toString('hex') })
     } catch (error) {
       Sentry.captureException(error)
-      logger.error(`Error generating VRF proof`, { vrfInputString, error })
+      logger.error('Error generating VRF proof', { vrfInput: call.request.vrfInput, error })
       callback(new Error('Error generating proof'), null)
     }
   },

@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app: app
+  name: app
+  namespace: app
+spec:
+  selector:
+    matchLabels:
+      app: app
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: app
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: app
+          image: appliedblockchain/algorand-randomness-beacon-app:latest
+          imagePullPolicy: Always
+          env:
+          - name: SERVICE
+            value: "app"
+          - name: NODE_ENV
+            value: "prod-b"
+          - name: LOG_LEVEL
+            value: "debug"
+          - name: ALGOD_TOKENS
+            valueFrom:
+              secretKeyRef:
+                name: app-env-vars
+                key: ALGOD_TOKENS
+          - name: ALGOD_SERVERS
+            value: https://testnet-algod.appliedblockchain.com,https://node.testnet.algoexplorerapi.io
+          - name: ALGOD_PORTS
+            value: ","
+          - name: APP_CREATOR_ADDRESS
+            value: "LWOXAHEF32ISGGQSQTOFFTVSVUGJIRRFSIJYRFVL4PK4KS7MNG4SBWKYK4"
+          - name: APP_ID
+            value: "110096026"
+          - name: DUMMY_APP_ID
+            value: "110096020"
+          - name: NUMBER_OF_DUMMY_TRANSACTIONS
+            value: "8"
+          - name: VRF_STARTING_ROUND
+            value: "19955232"
+          - name: VRF_GRPC_HOST
+            value: "dns:vrf.app.svc:50051"
+          - name: "SENTRY_DSN"
+            value: "https://0cdc8ad8aea54dbbbad3dd3b7bec531f@o1305787.ingest.sentry.io/6622570"
+          - name: SERVICE_MNEMONIC
+            valueFrom:
+              secretKeyRef:
+                name: app-env-vars
+                key: SERVICE_MNEMONIC
+          - name: SERVICE_ACCOUNT_MINIMUM_BALANCE
+            value: "10000000"
+          - name: DD_ENV
+            value: "prod-b randomness-oracle-env-02-a-eks"
+          - name: DD_VERSION
+            value: "0.0.1"
+          - name: DD_AGENT_HOST
+            valueFrom:
+              fieldRef:
+                fieldPath: status.hostIP
+          - name: DD_TRACE_AGENT_PORT
+            value: "8126"
+          - name: DD_LOGS_INJECTION
+            value: "true"
+          - name: MOST_DISTANT_ROUNDS_ALLOWED
+            value: "992"
+          - name: VRF_ROUND_MULTIPLE
+            value: "8"
+          - name: MAIN_LOOP_INTERVAL
+            value: "3000"
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+      imagePullSecrets:
+        - name: regcred
+      nodeSelector:
+        eks.amazonaws.com/nodegroup: randomness-oracle-env-02-b-nodes-app

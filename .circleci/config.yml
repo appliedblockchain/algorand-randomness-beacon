@@ -436,7 +436,7 @@ workflows:
       - approve-deploy-prod:
           filters:
             branches:
-              only: master #change to prod branch
+              only: main #change to prod branch
           type: approval
           requires:
             - build-vrf-prod
@@ -445,7 +445,7 @@ workflows:
       - deploy-prod-a:
           filters:
             branches:
-              only: master #change to prod branch
+              only: main #change to prod branch
           context:
             - org-global
           requires:
@@ -454,7 +454,7 @@ workflows:
       - deploy-prod-b:
           filters:
             branches:
-              only: master #change to prod branch
+              only: main #change to prod branch
           context:
             - org-global
           requires:

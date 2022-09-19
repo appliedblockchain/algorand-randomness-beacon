@@ -377,7 +377,7 @@ workflows:
       - build-vrf-prod:
           filters:
             branches:
-              only: prod #change to prod branch
+              only: main #change to prod branch
           context:
             - org-global
           requires:
@@ -387,7 +387,7 @@ workflows:
       - build-app-prod:
           filters:
             branches:
-              only: prod #change to prod branch
+              only: main #change to prod branch
           context:
             - org-global
           requires:

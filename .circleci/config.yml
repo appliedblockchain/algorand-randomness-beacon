@@ -166,6 +166,13 @@ jobs:
       - checkout
       - build-app
 
+  build-app-prod:
+    machine:
+      image: ubuntu-2004:2022.07.1
+    steps:
+      - checkout
+      - build-app
+
   build-vrf-dev:
     machine:
       image: ubuntu-2004:2022.07.1
@@ -174,6 +181,13 @@ jobs:
       - build-vrf
 
   build-vrf-staging:
+    machine:
+      image: ubuntu-2004:2022.07.1
+    steps:
+      - checkout
+      - build-vrf
+
+  build-vrf-prod:
     machine:
       image: ubuntu-2004:2022.07.1
     steps:
@@ -233,6 +247,46 @@ jobs:
             echo "export SERVICE_MNEMONIC=${STAGING_SERVICE_MNEMONIC}" >> ${BASH_ENV}
             echo "export APP_AWS_SECRET_ACCESS_KEY=${STAGING_APP_AWS_SECRET_ACCESS_KEY}" >> ${BASH_ENV}
             echo "export VRF_ENCRYPTED_KEY=${STAGING_VRF_ENCRYPTED_KEY}" >> ${BASH_ENV}
+      - checkout
+      - deploy-kubernetes
+
+  deploy-prod-a:
+    docker:
+      - image: cimg/base:stable
+        environment:
+          MANIFESTS_PATH: "prod-a"
+    steps:
+      - run:
+          name: Set Pipeline Env Vars
+          command: |
+            echo "export AWS_ACCESS_KEY_ID=${PROD_A_AWS_ACCESS_KEY_ID}" >> ${BASH_ENV}
+            echo "export AWS_SECRET_ACCESS_KEY=${PROD_A_AWS_SECRET_ACCESS_KEY}" >> ${BASH_ENV}
+            echo "export AWS_DEFAULT_REGION=${PROD_A_AWS_REGION}" >> ${BASH_ENV}
+            echo "export AWS_EKS_NAME=${PROD_A_AWS_EKS_NAME}" >> ${BASH_ENV}
+            echo "export ALGOD_TOKENS=${PROD_A_ALGOD_TOKENS}" >> ${BASH_ENV}
+            echo "export SERVICE_MNEMONIC=${PROD_A_SERVICE_MNEMONIC}" >> ${BASH_ENV}
+            echo "export APP_AWS_SECRET_ACCESS_KEY=${PROD_A_APP_AWS_SECRET_ACCESS_KEY}" >> ${BASH_ENV}
+            echo "export VRF_ENCRYPTED_KEY=${PROD_A_VRF_ENCRYPTED_KEY}" >> ${BASH_ENV}
+      - checkout
+      - deploy-kubernetes
+
+  deploy-prod-b:
+    docker:
+      - image: cimg/base:stable
+        environment:
+          MANIFESTS_PATH: "prod-b"
+    steps:
+      - run:
+          name: Set Pipeline Env Vars
+          command: |
+            echo "export AWS_ACCESS_KEY_ID=${PROD_B_AWS_ACCESS_KEY_ID}" >> ${BASH_ENV}
+            echo "export AWS_SECRET_ACCESS_KEY=${PROD_B_AWS_SECRET_ACCESS_KEY}" >> ${BASH_ENV}
+            echo "export AWS_DEFAULT_REGION=${PROD_B_AWS_REGION}" >> ${BASH_ENV}
+            echo "export AWS_EKS_NAME=${PROD_B_AWS_EKS_NAME}" >> ${BASH_ENV}
+            echo "export ALGOD_TOKENS=${PROD_B_ALGOD_TOKENS}" >> ${BASH_ENV}
+            echo "export SERVICE_MNEMONIC=${PROD_B_SERVICE_MNEMONIC}" >> ${BASH_ENV}
+            echo "export APP_AWS_SECRET_ACCESS_KEY=${PROD_B_APP_AWS_SECRET_ACCESS_KEY}" >> ${BASH_ENV}
+            echo "export VRF_ENCRYPTED_KEY=${PROD_B_VRF_ENCRYPTED_KEY}" >> ${BASH_ENV}
       - checkout
       - deploy-kubernetes
 
@@ -319,7 +373,40 @@ workflows:
             - build-app-staging
       ## /Build Staging
 
-      
+      ## Build Prod
+      - build-vrf-prod:
+          filters:
+            branches:
+              only: prod #change to prod branch
+          context:
+            - org-global
+          requires:
+            - test-app
+            - test-vrf
+
+      - build-app-prod:
+          filters:
+            branches:
+              only: prod #change to prod branch
+          context:
+            - org-global
+          requires:
+            - test-app
+            - test-vrf
+
+      - clean-dockerhub:
+          filters:
+            branches:
+              only:
+                - development #change to dev branch
+                - staging #change to staging branch
+                - main #change to prod branch
+          context:
+            - org-global
+          requires:
+            - build-vrf-prod
+            - build-app-prod
+      ## /Build Prod
 
       ## Deploy dev
       - deploy-dev:
@@ -344,3 +431,32 @@ workflows:
             - build-vrf-staging
             - build-app-staging
       ## /Deploy Staging
+
+      #Deploy prod
+      - approve-deploy-prod:
+          filters:
+            branches:
+              only: master #change to prod branch
+          type: approval
+          requires:
+            - build-vrf-prod
+            - build-app-prod
+
+      - deploy-prod-a:
+          filters:
+            branches:
+              only: master #change to prod branch
+          context:
+            - org-global
+          requires:
+            - approve-deploy-prod
+
+      - deploy-prod-b:
+          filters:
+            branches:
+              only: master #change to prod branch
+          context:
+            - org-global
+          requires:
+            - approve-deploy-prod
+      # /Deploy prod

@@ -206,6 +206,7 @@ jobs:
           name: build images
           command: |
             echo "export DOCKER_PASSWORD=${DOCKER_PASSWORD}" >> ${BASH_ENV}
+            echo "export ENV=${CIRCLE_BRANCH}" >> ${BASH_ENV}
       - run:
           name: Execute clean script
           command: cd stack-eks && ./clean-dockerhub-images.sh

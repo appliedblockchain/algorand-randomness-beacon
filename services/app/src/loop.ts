@@ -43,6 +43,8 @@ const mainFlow = async (client: Algodv2, algodServer: string) => {
       const submitResult = await tracer.trace('submit', {}, () =>
         submitValue(client, nextExpectedRound, Buffer.from(vrfProof, 'hex')),
       )
+      const roundsAfter = submitResult.confirmedRound - nextExpectedRound
+      const metSLA = roundsAfter > config.submittedAfterThreshold
       const dataToLog = {
         txID: submitResult.txIDs[0],
         lastRound,
@@ -51,13 +53,13 @@ const mainFlow = async (client: Algodv2, algodServer: string) => {
         blockSeed,
         vrfInput,
         vrfProof,
+        submittedAfterNumRounds: roundsAfter,
+        SLA: metSLA ? 'MET' : 'NOT_MET',
       }
+
       logger.debug('Proof submitted', dataToLog)
-      const roundsAfter = submitResult.confirmedRound - nextExpectedRound
-      span.addTags({ ...dataToLog, algodServer, result: 'SUBMITTED', SLA: 'MET', submittedAfterNumRounds: roundsAfter })
-      if (roundsAfter > 3) {
-        span.setTag('SLA', 'NOT_MET')
-        logger.warn('SLA not met', dataToLog)
+      span.addTags({ ...dataToLog, algodServer, result: 'SUBMITTED' })
+      if (!metSLA) {
         Sentry.captureException(new Error('Proof submitted outside SLA'), {
           extra: { ...dataToLog, roundsAfter },
         })
@@ -69,10 +71,11 @@ const mainFlow = async (client: Algodv2, algodServer: string) => {
           statusCode: error.response.statusCode,
           body: error.response.body,
           lastRound,
-          nextExpectedRound,
+          submittedRound: nextExpectedRound,
         })
       } else {
-        logger.error('Error submitting the proof', { lastRound, error, nextExpectedRound })
+        logger.error(error)
+        logger.error('Error submitting the proof', { lastRound, submittedRound: nextExpectedRound })
       }
     }
   } catch (error) {

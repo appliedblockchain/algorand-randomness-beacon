@@ -3,6 +3,7 @@ import fs from 'fs'
 import { TealKeyValue } from 'algosdk/dist/types/src/client/v2/algod/models/types'
 import { join } from 'path'
 import config from '../config'
+import { randomUUID } from 'crypto'
 const {
   algodPorts,
   algodServers,
@@ -63,6 +64,8 @@ export const getGlobalStateValue = async (
   return getValueFromKeyValue(keyValue, false)
 }
 
+const encoder = new TextEncoder()
+
 export const submitValue = async (
   client: algosdk.Algodv2,
   blockNumber: number,
@@ -75,6 +78,9 @@ export const submitValue = async (
   const sp = await client.getTransactionParams().do()
   const comp = new algosdk.AtomicTransactionComposer()
 
+  const timestamp = Date.now()
+  const uuid = randomUUID()
+  const note = encoder.encode(`${uuid}-${timestamp.toString()}`)
   sp.firstRound = blockNumber + 1
   sp.lastRound = sp.firstRound + 1000
   comp.addMethodCall({
@@ -84,10 +90,12 @@ export const submitValue = async (
     sender: serviceAccount.addr,
     suggestedParams: sp,
     signer,
+    note,
   })
 
   for (let i = 0; i < numDummyTransactions; i++) {
-    const txn = algosdk.makeApplicationNoOpTxn(serviceAccount.addr, sp, dummyAppId, [], [], [], [], new Uint8Array([i]))
+    const dummyTxNote = encoder.encode(`${note}-${i}`)
+    const txn = algosdk.makeApplicationNoOpTxn(serviceAccount.addr, sp, dummyAppId, [], [], [], [], dummyTxNote)
     comp.addTransaction({ txn, signer })
   }
 

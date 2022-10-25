@@ -15,6 +15,7 @@ const config = {
   vrfRoundMultiple: parseInt(process.env.VRF_ROUND_MULTIPLE, 10),
   mainLoopInterval: parseInt(process.env.MAIN_LOOP_INTERVAL, 10),
   numDummyTransactions: parseInt(process.env.NUMBER_OF_DUMMY_TRANSACTIONS),
+  submittedAfterThreshold: parseInt(process.env.SUBMITTED_AFTER_THRESHOLD, 10),
 }
 
 export default config

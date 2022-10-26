@@ -44,7 +44,7 @@ const mainFlow = async (client: Algodv2, algodServer: string) => {
         submitValue(client, nextExpectedRound, Buffer.from(vrfProof, 'hex')),
       )
       const roundsAfter = submitResult.confirmedRound - nextExpectedRound
-      const metSLA = roundsAfter > config.submittedAfterThreshold
+      const metSLA = config.submittedAfterThreshold >= roundsAfter
       const dataToLog = {
         txID: submitResult.txIDs[0],
         lastRound,

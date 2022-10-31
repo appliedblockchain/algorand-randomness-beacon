@@ -78,6 +78,8 @@ spec:
             value: "8"
           - name: MAIN_LOOP_INTERVAL
             value: "3000"
+          - name: SUBMITTED_AFTER_THRESHOLD
+            value: "3"
           resources:
             requests:
               cpu: 200m

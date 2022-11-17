@@ -42,13 +42,13 @@ spec:
           - name: APP_CREATOR_ADDRESS
             value: "YOVFLARZNWGKV7DAIHNK66HVYYJGYFQQIUAGWHOAMOPNOFSI5MR54ZCGMQ"
           - name: APP_ID
-            value: "110096026"
+            value: "947957720"
           - name: DUMMY_APP_ID
-            value: "110096020"
+            value: "947957626"
           - name: NUMBER_OF_DUMMY_TRANSACTIONS
             value: "8"
           - name: VRF_STARTING_ROUND
-            value: "19955232"
+            value: "24922168"
           - name: VRF_GRPC_HOST
             value: "dns:vrf.app.svc:50051"
           - name: "SENTRY_DSN"

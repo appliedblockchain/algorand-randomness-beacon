@@ -36,11 +36,11 @@ spec:
                 name: app-env-vars
                 key: ALGOD_TOKENS
           - name: ALGOD_SERVERS
-            value: https://testnet-algod.appliedblockchain.com,https://node.testnet.algoexplorerapi.io
+            value: https://algod.appliedblockchain.com,https://node.algoexplorerapi.io
           - name: ALGOD_PORTS
             value: ","
           - name: APP_CREATOR_ADDRESS
-            value: "LWOXAHEF32ISGGQSQTOFFTVSVUGJIRRFSIJYRFVL4PK4KS7MNG4SBWKYK4"
+            value: "YOVFLARZNWGKV7DAIHNK66HVYYJGYFQQIUAGWHOAMOPNOFSI5MR54ZCGMQ"
           - name: APP_ID
             value: "110096026"
           - name: DUMMY_APP_ID

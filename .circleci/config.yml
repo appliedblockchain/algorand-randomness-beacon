@@ -9,7 +9,7 @@ commands:
           command: docker-compose -f docker-compose.yml build vrf
       - run:
           name: Login to Dockerhub
-          command: docker login -u abbuilder -p "$DOCKER_PASSWORD"
+          command: docker login -u "$DOCKER_USER2" -p "$DOCKER_PASSWORD2"
       - run:
           name: tag vrf image
           command: docker tag appliedblockchain/algorand-randomness-beacon-vrf:latest appliedblockchain/algorand-randomness-beacon-vrf:${CIRCLE_BRANCH}-${CIRCLE_SHA1}
@@ -27,7 +27,7 @@ commands:
           command: docker-compose -f docker-compose.yml build app
       - run:
           name: Login to Dockerhub
-          command: docker login -u abbuilder -p "$DOCKER_PASSWORD"
+          command: docker login -u "$DOCKER_USER2" -p "$DOCKER_PASSWORD2"
       - run:
           name: tag app image
           command: docker tag appliedblockchain/algorand-randomness-beacon-app:latest appliedblockchain/algorand-randomness-beacon-app:${CIRCLE_BRANCH}-${CIRCLE_SHA1}

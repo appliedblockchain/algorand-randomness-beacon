@@ -2,7 +2,7 @@
 FROM node@sha256:d39ab4712a8395d0b399dea44d9cb8b34ac942411b6a380449ebdb9d321136a3 as builder
 WORKDIR /usr/src/app
 COPY . /usr/src/app
-RUN apk add --no-cache --virtual .gyp python3=3.10.5-r0 make=4.3-r0 gcc=11.2.1_git20220219-r2 py3-pip=22.1.1-r0 g++=11.2.1_git20220219-r2
+RUN apk add --no-cache --virtual .gyp python3=3.10.9-r0 make=4.3-r0 gcc=11.2.1_git20220219-r2 py3-pip=22.1.1-r0 g++=11.2.1_git20220219-r2
 RUN npm install -g node-gyp
 RUN npm install &&\
   npm run build:proto &&\

@@ -226,7 +226,7 @@ jobs:
             echo "export AWS_EKS_NAME=${DEV_AWS_EKS_NAME}" >> ${BASH_ENV}
             echo "export ALGOD_TOKENS=${DEV_ALGOD_TOKENS}" >> ${BASH_ENV}
             echo "export SERVICE_MNEMONIC=${DEV_SERVICE_MNEMONIC}" >> ${BASH_ENV}
-            echo "export APP_AWS_SECRET_ACCESS_KEY=${DEV_APP_AWS_SECRET_ACCESS_KEY}" >> ${BASH_ENV}
+            echo "export APP_AWS_SECRET_ACCESS_KEY=${DEV_APP_AWS_SECRET_ACCESS_KEY2}" >> ${BASH_ENV}
             echo "export VRF_ENCRYPTED_KEY=${DEV_VRF_ENCRYPTED_KEY}" >> ${BASH_ENV}
       - checkout
       - deploy-kubernetes
@@ -246,7 +246,7 @@ jobs:
             echo "export AWS_EKS_NAME=${STAGING_AWS_EKS_NAME}" >> ${BASH_ENV}
             echo "export ALGOD_TOKENS=${STAGING_ALGOD_TOKENS}" >> ${BASH_ENV}
             echo "export SERVICE_MNEMONIC=${STAGING_SERVICE_MNEMONIC}" >> ${BASH_ENV}
-            echo "export APP_AWS_SECRET_ACCESS_KEY=${STAGING_APP_AWS_SECRET_ACCESS_KEY}" >> ${BASH_ENV}
+            echo "export APP_AWS_SECRET_ACCESS_KEY=${STAGING_APP_AWS_SECRET_ACCESS_KEY2}" >> ${BASH_ENV}
             echo "export VRF_ENCRYPTED_KEY=${STAGING_VRF_ENCRYPTED_KEY}" >> ${BASH_ENV}
       - checkout
       - deploy-kubernetes

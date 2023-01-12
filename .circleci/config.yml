@@ -220,13 +220,13 @@ jobs:
       - run:
           name: Set Pipeline Env Vars
           command: |
-            echo "export AWS_ACCESS_KEY_ID=${DEV_AWS_ACCESS_KEY_ID2}" >> ${BASH_ENV}
-            echo "export AWS_SECRET_ACCESS_KEY=${DEV_AWS_SECRET_ACCESS_KEY2}" >> ${BASH_ENV}
+            echo "export AWS_ACCESS_KEY_ID=${DEV_AWS_ACCESS_KEY_ID}" >> ${BASH_ENV}
+            echo "export AWS_SECRET_ACCESS_KEY=${DEV_AWS_SECRET_ACCESS_KEY}" >> ${BASH_ENV}
             echo "export AWS_DEFAULT_REGION=${DEV_AWS_REGION}" >> ${BASH_ENV}
             echo "export AWS_EKS_NAME=${DEV_AWS_EKS_NAME}" >> ${BASH_ENV}
             echo "export ALGOD_TOKENS=${DEV_ALGOD_TOKENS}" >> ${BASH_ENV}
             echo "export SERVICE_MNEMONIC=${DEV_SERVICE_MNEMONIC}" >> ${BASH_ENV}
-            echo "export APP_AWS_SECRET_ACCESS_KEY=${DEV_APP_AWS_SECRET_ACCESS_KEY2}" >> ${BASH_ENV}
+            echo "export APP_AWS_SECRET_ACCESS_KEY=${DEV_APP_AWS_SECRET_ACCESS_KEY}" >> ${BASH_ENV}
             echo "export VRF_ENCRYPTED_KEY=${DEV_VRF_ENCRYPTED_KEY}" >> ${BASH_ENV}
       - checkout
       - deploy-kubernetes

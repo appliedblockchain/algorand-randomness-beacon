@@ -240,8 +240,8 @@ jobs:
       - run:
           name: Set Pipeline Env Vars
           command: |
-            echo "export AWS_ACCESS_KEY_ID=${STAGING_AWS_ACCESS_KEY_ID}" >> ${BASH_ENV}
-            echo "export AWS_SECRET_ACCESS_KEY=${STAGING_AWS_SECRET_ACCESS_KEY}" >> ${BASH_ENV}
+            echo "export AWS_ACCESS_KEY_ID=${STAGING_AWS_ACCESS_KEY_ID2}" >> ${BASH_ENV}
+            echo "export AWS_SECRET_ACCESS_KEY=${STAGING_AWS_SECRET_ACCESS_KEY2}" >> ${BASH_ENV}
             echo "export AWS_DEFAULT_REGION=${STAGING_AWS_REGION}" >> ${BASH_ENV}
             echo "export AWS_EKS_NAME=${STAGING_AWS_EKS_NAME}" >> ${BASH_ENV}
             echo "export ALGOD_TOKENS=${STAGING_ALGOD_TOKENS}" >> ${BASH_ENV}

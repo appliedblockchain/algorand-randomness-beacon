@@ -33,7 +33,7 @@ spec:
           - name: AWS_REGION
             value: "eu-west-1"
           - name: AWS_ACCESS_KEY_ID
-            value: "AKIAVQ5QOOOM7F2MUCA2"
+            value: "AKIAUCFCNNDP43FOEMXL"
           - name: AWS_SECRET_ACCESS_KEY
             valueFrom:
               secretKeyRef:

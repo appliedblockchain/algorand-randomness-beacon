@@ -434,10 +434,19 @@ workflows:
       ## /Deploy Staging
 
       #Deploy prod
-      - approve-deploy-prod:
+      - approve-deploy-prod-a:
           filters:
             branches:
-              only: main #change to prod branch
+              only: main
+          type: approval
+          requires:
+            - build-vrf-prod
+            - build-app-prod
+
+      - approve-deploy-prod-b:
+          filters:
+            branches:
+              only: main
           type: approval
           requires:
             - build-vrf-prod
@@ -446,19 +455,18 @@ workflows:
       - deploy-prod-a:
           filters:
             branches:
-              only: main #change to prod branch
+              only: main
           context:
             - org-global
           requires:
-            - approve-deploy-prod
+            - approve-deploy-prod-a
 
       - deploy-prod-b:
           filters:
             branches:
-              only: main #change to prod branch
+              only: main
           context:
             - org-global
           requires:
-            - approve-deploy-prod
-            - deploy-prod-a
+            - approve-deploy-prod-b
       # /Deploy prod

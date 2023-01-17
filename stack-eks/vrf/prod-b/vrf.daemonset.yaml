@@ -33,14 +33,14 @@ spec:
           - name: AWS_REGION
             value: "eu-west-1"
           - name: AWS_ACCESS_KEY_ID
-            value: "AKIAUCFCNNDP43FOEMXL"
+            value: "AKIAUCFCNNDP3KTGUU2C"
           - name: AWS_SECRET_ACCESS_KEY
             valueFrom:
               secretKeyRef:
                 name: app-env-vars
                 key: AWS_SECRET_ACCESS_KEY
           - name: AWS_KMS_KEY_ID
-            value: "mrk-16204a3cd38f4c1c8c0a523b9ba10bf2"
+            value: "mrk-b052d34bfc334732978512e73acb9f41"
           - name: VRF_ENCRYPTED_KEY
             valueFrom:
               secretKeyRef:

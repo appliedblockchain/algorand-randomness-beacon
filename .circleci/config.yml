@@ -9,7 +9,7 @@ commands:
           command: docker-compose -f docker-compose.yml build vrf
       - run:
           name: Login to Dockerhub
-          command: docker login -u abbuilder -p "$DOCKER_PASSWORD"
+          command: docker login -u "$DOCKER_USER2" -p "$DOCKER_PASSWORD2"
       - run:
           name: tag vrf image
           command: docker tag appliedblockchain/algorand-randomness-beacon-vrf:latest appliedblockchain/algorand-randomness-beacon-vrf:${CIRCLE_BRANCH}-${CIRCLE_SHA1}
@@ -27,7 +27,7 @@ commands:
           command: docker-compose -f docker-compose.yml build app
       - run:
           name: Login to Dockerhub
-          command: docker login -u abbuilder -p "$DOCKER_PASSWORD"
+          command: docker login -u "$DOCKER_USER2" -p "$DOCKER_PASSWORD2"
       - run:
           name: tag app image
           command: docker tag appliedblockchain/algorand-randomness-beacon-app:latest appliedblockchain/algorand-randomness-beacon-app:${CIRCLE_BRANCH}-${CIRCLE_SHA1}
@@ -220,13 +220,13 @@ jobs:
       - run:
           name: Set Pipeline Env Vars
           command: |
-            echo "export AWS_ACCESS_KEY_ID=${DEV_AWS_ACCESS_KEY_ID}" >> ${BASH_ENV}
-            echo "export AWS_SECRET_ACCESS_KEY=${DEV_AWS_SECRET_ACCESS_KEY}" >> ${BASH_ENV}
+            echo "export AWS_ACCESS_KEY_ID=${DEV_AWS_ACCESS_KEY_ID2}" >> ${BASH_ENV}
+            echo "export AWS_SECRET_ACCESS_KEY=${DEV_AWS_SECRET_ACCESS_KEY2}" >> ${BASH_ENV}
             echo "export AWS_DEFAULT_REGION=${DEV_AWS_REGION}" >> ${BASH_ENV}
             echo "export AWS_EKS_NAME=${DEV_AWS_EKS_NAME}" >> ${BASH_ENV}
             echo "export ALGOD_TOKENS=${DEV_ALGOD_TOKENS}" >> ${BASH_ENV}
             echo "export SERVICE_MNEMONIC=${DEV_SERVICE_MNEMONIC}" >> ${BASH_ENV}
-            echo "export APP_AWS_SECRET_ACCESS_KEY=${DEV_APP_AWS_SECRET_ACCESS_KEY}" >> ${BASH_ENV}
+            echo "export APP_AWS_SECRET_ACCESS_KEY=${DEV_APP_AWS_SECRET_ACCESS_KEY2}" >> ${BASH_ENV}
             echo "export VRF_ENCRYPTED_KEY=${DEV_VRF_ENCRYPTED_KEY}" >> ${BASH_ENV}
       - checkout
       - deploy-kubernetes
@@ -240,13 +240,13 @@ jobs:
       - run:
           name: Set Pipeline Env Vars
           command: |
-            echo "export AWS_ACCESS_KEY_ID=${STAGING_AWS_ACCESS_KEY_ID}" >> ${BASH_ENV}
-            echo "export AWS_SECRET_ACCESS_KEY=${STAGING_AWS_SECRET_ACCESS_KEY}" >> ${BASH_ENV}
+            echo "export AWS_ACCESS_KEY_ID=${STAGING_AWS_ACCESS_KEY_ID2}" >> ${BASH_ENV}
+            echo "export AWS_SECRET_ACCESS_KEY=${STAGING_AWS_SECRET_ACCESS_KEY2}" >> ${BASH_ENV}
             echo "export AWS_DEFAULT_REGION=${STAGING_AWS_REGION}" >> ${BASH_ENV}
             echo "export AWS_EKS_NAME=${STAGING_AWS_EKS_NAME}" >> ${BASH_ENV}
             echo "export ALGOD_TOKENS=${STAGING_ALGOD_TOKENS}" >> ${BASH_ENV}
             echo "export SERVICE_MNEMONIC=${STAGING_SERVICE_MNEMONIC}" >> ${BASH_ENV}
-            echo "export APP_AWS_SECRET_ACCESS_KEY=${STAGING_APP_AWS_SECRET_ACCESS_KEY}" >> ${BASH_ENV}
+            echo "export APP_AWS_SECRET_ACCESS_KEY=${STAGING_APP_AWS_SECRET_ACCESS_KEY2}" >> ${BASH_ENV}
             echo "export VRF_ENCRYPTED_KEY=${STAGING_VRF_ENCRYPTED_KEY}" >> ${BASH_ENV}
       - checkout
       - deploy-kubernetes
@@ -260,13 +260,13 @@ jobs:
       - run:
           name: Set Pipeline Env Vars
           command: |
-            echo "export AWS_ACCESS_KEY_ID=${PROD_A_AWS_ACCESS_KEY_ID}" >> ${BASH_ENV}
-            echo "export AWS_SECRET_ACCESS_KEY=${PROD_A_AWS_SECRET_ACCESS_KEY}" >> ${BASH_ENV}
+            echo "export AWS_ACCESS_KEY_ID=${PROD_A_AWS_ACCESS_KEY_ID2}" >> ${BASH_ENV}
+            echo "export AWS_SECRET_ACCESS_KEY=${PROD_A_AWS_SECRET_ACCESS_KEY2}" >> ${BASH_ENV}
             echo "export AWS_DEFAULT_REGION=${PROD_A_AWS_REGION}" >> ${BASH_ENV}
             echo "export AWS_EKS_NAME=${PROD_A_AWS_EKS_NAME}" >> ${BASH_ENV}
             echo "export ALGOD_TOKENS=${PROD_A_ALGOD_TOKENS}" >> ${BASH_ENV}
             echo "export SERVICE_MNEMONIC=${PROD_A_SERVICE_MNEMONIC}" >> ${BASH_ENV}
-            echo "export APP_AWS_SECRET_ACCESS_KEY=${PROD_A_APP_AWS_SECRET_ACCESS_KEY}" >> ${BASH_ENV}
+            echo "export APP_AWS_SECRET_ACCESS_KEY=${PROD_A_APP_AWS_SECRET_ACCESS_KEY2}" >> ${BASH_ENV}
             echo "export VRF_ENCRYPTED_KEY=${PROD_A_VRF_ENCRYPTED_KEY}" >> ${BASH_ENV}
       - checkout
       - deploy-kubernetes
@@ -280,13 +280,13 @@ jobs:
       - run:
           name: Set Pipeline Env Vars
           command: |
-            echo "export AWS_ACCESS_KEY_ID=${PROD_B_AWS_ACCESS_KEY_ID}" >> ${BASH_ENV}
-            echo "export AWS_SECRET_ACCESS_KEY=${PROD_B_AWS_SECRET_ACCESS_KEY}" >> ${BASH_ENV}
+            echo "export AWS_ACCESS_KEY_ID=${PROD_B_AWS_ACCESS_KEY_ID2}" >> ${BASH_ENV}
+            echo "export AWS_SECRET_ACCESS_KEY=${PROD_B_AWS_SECRET_ACCESS_KEY2}" >> ${BASH_ENV}
             echo "export AWS_DEFAULT_REGION=${PROD_B_AWS_REGION}" >> ${BASH_ENV}
             echo "export AWS_EKS_NAME=${PROD_B_AWS_EKS_NAME}" >> ${BASH_ENV}
             echo "export ALGOD_TOKENS=${PROD_B_ALGOD_TOKENS}" >> ${BASH_ENV}
             echo "export SERVICE_MNEMONIC=${PROD_B_SERVICE_MNEMONIC}" >> ${BASH_ENV}
-            echo "export APP_AWS_SECRET_ACCESS_KEY=${PROD_B_APP_AWS_SECRET_ACCESS_KEY}" >> ${BASH_ENV}
+            echo "export APP_AWS_SECRET_ACCESS_KEY=${PROD_B_APP_AWS_SECRET_ACCESS_KEY2}" >> ${BASH_ENV}
             echo "export VRF_ENCRYPTED_KEY=${PROD_B_VRF_ENCRYPTED_KEY}" >> ${BASH_ENV}
       - checkout
       - deploy-kubernetes
@@ -434,10 +434,19 @@ workflows:
       ## /Deploy Staging
 
       #Deploy prod
-      - approve-deploy-prod:
+      - approve-deploy-prod-a:
           filters:
             branches:
-              only: main #change to prod branch
+              only: main
+          type: approval
+          requires:
+            - build-vrf-prod
+            - build-app-prod
+
+      - approve-deploy-prod-b:
+          filters:
+            branches:
+              only: main
           type: approval
           requires:
             - build-vrf-prod
@@ -446,19 +455,18 @@ workflows:
       - deploy-prod-a:
           filters:
             branches:
-              only: main #change to prod branch
+              only: main
           context:
             - org-global
           requires:
-            - approve-deploy-prod
+            - approve-deploy-prod-a
 
       - deploy-prod-b:
           filters:
             branches:
-              only: main #change to prod branch
+              only: main
           context:
             - org-global
           requires:
-            - approve-deploy-prod
-            - deploy-prod-a
+            - approve-deploy-prod-b
       # /Deploy prod

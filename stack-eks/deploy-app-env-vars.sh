@@ -3,7 +3,7 @@
 echo "Generating temporary manifest with secrets."
 cp app-env-vars.secrets.txt app-env-vars.secrets-tmp.yaml
 sed -i "s^{{ALGOD_TOKENS}}^$ALGOD_TOKENS^g" app-env-vars.secrets-tmp.yaml
-sed -i "s^{{ALGOD_SERVERS}}^$ALGOD_SERVER^g" app-env-vars.secrets-tmp.yaml
+sed -i "s^{{ALGOD_SERVERS}}^$ALGOD_SERVERS^g" app-env-vars.secrets-tmp.yaml
 sed -i "s^{{ALGOD_PORTS}}^$ALGOD_PORTS^g" app-env-vars.secrets-tmp.yaml
 sed -i "s^{{SENTRY_DSN}}^$ALGOD_SENTRY_DSN^g" app-env-vars.secrets-tmp.yaml
 sed -i "s^{{SERVICE_MNEMONIC}}^$SERVICE_MNEMONIC^g" app-env-vars.secrets-tmp.yaml

@@ -36,9 +36,15 @@ spec:
                 name: app-env-vars
                 key: ALGOD_TOKENS
           - name: ALGOD_SERVERS
-            value: https://algod.appliedblockchain.com,https://node.algoexplorerapi.io
+            valueFrom:
+              secretKeyRef:
+                name: app-env-vars
+                key: ALGOD_SERVERS
           - name: ALGOD_PORTS
-            value: ","
+            valueFrom:
+              secretKeyRef:
+                name: app-env-vars
+                key: ALGOD_PORTS
           - name: APP_CREATOR_ADDRESS
             value: "YOVFLARZNWGKV7DAIHNK66HVYYJGYFQQIUAGWHOAMOPNOFSI5MR54ZCGMQ"
           - name: APP_ID
@@ -51,15 +57,16 @@ spec:
             value: "24922168"
           - name: VRF_GRPC_HOST
             value: "dns:vrf.app.svc:50051"
-          - name: "SENTRY_DSN"
-            value: "https://0cdc8ad8aea54dbbbad3dd3b7bec531f@o1305787.ingest.sentry.io/6622570"
+          - name: SENTRY_DSN
+            valueFrom:
+              secretKeyRef:
+                name: app-env-vars
+                key: SENTRY_DSN
           - name: SERVICE_MNEMONIC
             valueFrom:
               secretKeyRef:
                 name: app-env-vars
                 key: SERVICE_MNEMONIC
-          - name: SERVICE_ACCOUNT_MINIMUM_BALANCE
-            value: "10000000"
           - name: DD_ENV
             value: "prod-a randomness-oracle-env-02-a-eks"
           - name: DD_VERSION

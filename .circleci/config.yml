@@ -227,6 +227,7 @@ jobs:
             echo "export ALGOD_TOKENS=${DEV_ALGOD_TOKENS}" >> ${BASH_ENV}
             echo "export ALGOD_SERVERS=${DEV_ALGOD_SERVERS}" >> ${BASH_ENV}
             echo "export ALGOD_PORTS=${DEV_ALGOD_PORTS}" >> ${BASH_ENV}
+            echo "export SENTRY_DSN=${DEV_SENTRY_DSN}" >> ${BASH_ENV}
             echo "export SERVICE_MNEMONIC=${DEV_SERVICE_MNEMONIC}" >> ${BASH_ENV}
             echo "export APP_AWS_SECRET_ACCESS_KEY=${DEV_APP_AWS_SECRET_ACCESS_KEY2}" >> ${BASH_ENV}
             echo "export VRF_ENCRYPTED_KEY=${DEV_VRF_ENCRYPTED_KEY}" >> ${BASH_ENV}
@@ -249,6 +250,7 @@ jobs:
             echo "export ALGOD_TOKENS=${STAGING_ALGOD_TOKENS}" >> ${BASH_ENV}
             echo "export ALGOD_SERVERS=${STAGING_ALGOD_SERVERS}" >> ${BASH_ENV}
             echo "export ALGOD_PORTS=${STAGING_ALGOD_PORTS}" >> ${BASH_ENV}
+            echo "export SENTRY_DSN=${STAGING_SENTRY_DSN}" >> ${BASH_ENV}
             echo "export SERVICE_MNEMONIC=${STAGING_SERVICE_MNEMONIC}" >> ${BASH_ENV}
             echo "export APP_AWS_SECRET_ACCESS_KEY=${STAGING_APP_AWS_SECRET_ACCESS_KEY2}" >> ${BASH_ENV}
             echo "export VRF_ENCRYPTED_KEY=${STAGING_VRF_ENCRYPTED_KEY}" >> ${BASH_ENV}
@@ -271,6 +273,7 @@ jobs:
             echo "export ALGOD_TOKENS=${PROD_A_ALGOD_TOKENS}" >> ${BASH_ENV}
             echo "export ALGOD_SERVERS=${PROD_A_ALGOD_SERVERS}" >> ${BASH_ENV}
             echo "export ALGOD_PORTS=${PROD_A_ALGOD_PORTS}" >> ${BASH_ENV}
+            echo "export SENTRY_DSN=${PROD_A_SENTRY_DSN}" >> ${BASH_ENV}
             echo "export SERVICE_MNEMONIC=${PROD_A_SERVICE_MNEMONIC}" >> ${BASH_ENV}
             echo "export APP_AWS_SECRET_ACCESS_KEY=${PROD_A_APP_AWS_SECRET_ACCESS_KEY2}" >> ${BASH_ENV}
             echo "export VRF_ENCRYPTED_KEY=${PROD_A_VRF_ENCRYPTED_KEY}" >> ${BASH_ENV}
@@ -293,6 +296,7 @@ jobs:
             echo "export ALGOD_TOKENS=${PROD_B_ALGOD_TOKENS}" >> ${BASH_ENV}
             echo "export ALGOD_SERVERS=${PROD_B_ALGOD_SERVERS}" >> ${BASH_ENV}
             echo "export ALGOD_PORTS=${PROD_B_ALGOD_PORTS}" >> ${BASH_ENV}
+            echo "export SENTRY_DSN=${PROD_B_SENTRY_DSN}" >> ${BASH_ENV}
             echo "export SERVICE_MNEMONIC=${PROD_B_SERVICE_MNEMONIC}" >> ${BASH_ENV}
             echo "export APP_AWS_SECRET_ACCESS_KEY=${PROD_B_APP_AWS_SECRET_ACCESS_KEY2}" >> ${BASH_ENV}
             echo "export VRF_ENCRYPTED_KEY=${PROD_B_VRF_ENCRYPTED_KEY}" >> ${BASH_ENV}

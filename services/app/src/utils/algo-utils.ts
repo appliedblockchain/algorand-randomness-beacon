@@ -18,7 +18,8 @@ const {
 } = config
 
 export const algodClients = algodServers.map((algodServer, index) => {
-  return { algodClient: new algosdk.Algodv2(algodTokens[index], algodServer, algodPorts[index]), algodServer }
+  const algodServerHostname = new URL(algodServer).hostname
+  return { algodClient: new algosdk.Algodv2(algodTokens[index], algodServer, algodPorts[index]), algodServer: algodServerHostname }
 })
 
 const serviceAccount = algosdk.mnemonicToSecretKey(serviceMnemonic)

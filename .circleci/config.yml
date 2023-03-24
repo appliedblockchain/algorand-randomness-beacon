@@ -316,26 +316,26 @@ workflows:
           context:
             - org-global
 
-      ## Build Dev
-      - build-vrf-dev:
-          filters:
-            branches:
-              only: development #change to dev branch
-          context:
-            - org-global
-          requires:
-            - test-app
-            - test-vrf
+      # ## Build Dev
+      # - build-vrf-dev:
+      #     filters:
+      #       branches:
+      #         only: development #change to dev branch
+      #     context:
+      #       - org-global
+      #     requires:
+      #       - test-app
+      #       - test-vrf
 
-      - build-app-dev:
-          filters:
-            branches:
-              only: development #change to dev branch
-          context:
-            - org-global
-          requires:
-            - test-app
-            - test-vrf
+      # - build-app-dev:
+      #     filters:
+      #       branches:
+      #         only: development #change to dev branch
+      #     context:
+      #       - org-global
+      #     requires:
+      #       - test-app
+      #       - test-vrf
 
       - clean-dockerhub:
           filters:
@@ -421,17 +421,17 @@ workflows:
             - build-app-prod
       ## /Build Prod
 
-      ## Deploy dev
-      - deploy-dev:
-          filters:
-            branches:
-              only: development #change to dev branch
-          context:
-            - org-global
-          requires:
-            - build-vrf-dev
-            - build-app-dev
-      ## /Deploy dev
+      # ## Deploy dev
+      # - deploy-dev:
+      #     filters:
+      #       branches:
+      #         only: development #change to dev branch
+      #     context:
+      #       - org-global
+      #     requires:
+      #       - build-vrf-dev
+      #       - build-app-dev
+      # ## /Deploy dev
 
       ## Deploy Staging
       - deploy-staging:

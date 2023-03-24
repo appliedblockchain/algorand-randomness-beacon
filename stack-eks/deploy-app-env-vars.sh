@@ -5,7 +5,7 @@ cp app-env-vars.secrets.txt app-env-vars.secrets-tmp.yaml
 sed -i "s^{{ALGOD_TOKENS}}^$ALGOD_TOKENS^g" app-env-vars.secrets-tmp.yaml
 sed -i "s^{{ALGOD_SERVERS}}^$ALGOD_SERVERS^g" app-env-vars.secrets-tmp.yaml
 sed -i "s^{{ALGOD_PORTS}}^$ALGOD_PORTS^g" app-env-vars.secrets-tmp.yaml
-sed -i "s^{{SENTRY_DSN}}^$ALGOD_SENTRY_DSN^g" app-env-vars.secrets-tmp.yaml
+sed -i "s^{{SENTRY_DSN}}^$SENTRY_DSN^g" app-env-vars.secrets-tmp.yaml
 sed -i "s^{{SERVICE_MNEMONIC}}^$SERVICE_MNEMONIC^g" app-env-vars.secrets-tmp.yaml
 sed -i "s^{{AWS_SECRET_ACCESS_KEY}}^$APP_AWS_SECRET_ACCESS_KEY^g" app-env-vars.secrets-tmp.yaml
 sed -i "s^{{VRF_ENCRYPTED_KEY}}^$VRF_ENCRYPTED_KEY^g" app-env-vars.secrets-tmp.yaml

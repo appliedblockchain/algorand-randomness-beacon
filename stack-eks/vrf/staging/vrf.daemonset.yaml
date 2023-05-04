@@ -31,16 +31,16 @@ spec:
           - name: LOG_LEVEL
             value: "debug"
           - name: AWS_REGION
-            value: "eu-west-1"
+            value: "us-east-2"
           - name: AWS_ACCESS_KEY_ID
-            value: "AKIAVQ5QOOOMSVRKS62A"
+            value: "AKIAVQ5QOOOM2EZ4RQEQ"
           - name: AWS_SECRET_ACCESS_KEY
             valueFrom:
               secretKeyRef:
                 name: app-env-vars
                 key: AWS_SECRET_ACCESS_KEY
           - name: AWS_KMS_KEY_ID
-            value: "mrk-16204a3cd38f4c1c8c0a523b9ba10bf2"
+            value: "mrk-60fae2be9d384c378c805905d6c3e2e5"
           - name: VRF_ENCRYPTED_KEY
             valueFrom:
               secretKeyRef:

@@ -40,7 +40,7 @@ spec:
                 name: app-env-vars
                 key: AWS_SECRET_ACCESS_KEY
           - name: AWS_KMS_KEY_ID
-            value: "mrk-60fae2be9d384c378c805905d6c3e2e5"
+            value: "mrk-e8df0f9cc7d044b4a8e16c5c169d49f1"
           - name: VRF_ENCRYPTED_KEY
             valueFrom:
               secretKeyRef:

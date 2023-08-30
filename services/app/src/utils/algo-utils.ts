@@ -19,7 +19,15 @@ const {
 
 export const algodClients = algodServers.map((algodServer, index) => {
   const algodServerHostname = new URL(algodServer).hostname
-  return { algodClient: new algosdk.Algodv2(algodTokens[index], algodServer, algodPorts[index]), algodServer: algodServerHostname }
+  let token
+  if (algodServer.includes('purestake')) {
+    token = {
+      'X-API-Key': algodTokens[index],
+    }
+  } else {
+    token = algodTokens[index]
+  }
+  return { algodClient: new algosdk.Algodv2(token, algodServer, algodPorts[index]), algodServer: algodServerHostname }
 })
 
 const serviceAccount = algosdk.mnemonicToSecretKey(serviceMnemonic)
